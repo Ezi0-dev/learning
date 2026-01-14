@@ -2,12 +2,14 @@
 
 // ESM
 import Fastify from 'fastify'
+import dbConnector from './db.js'
 import testRoute from './testRoute.js'
 
 const fastify = Fastify({
   logger: true
 })
 
+fastify.register(dbConnector)
 fastify.register(testRoute)
 
 // Run the server!

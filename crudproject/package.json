@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Basic crud project for learning",
   "main": "server.js",
-  "type":"module",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js",
@@ -13,7 +13,10 @@
   "author": "Light",
   "license": "ISC",
   "dependencies": {
-    "fastify": "^5.6.2"
+    "@fastify/postgres": "^6.0.2",
+    "fastify": "^5.6.2",
+    "fastify-plugin": "^5.1.0",
+    "pg": "^8.16.3"
   },
   "devDependencies": {
     "nodemon": "^3.1.11"
