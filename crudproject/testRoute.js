@@ -9,7 +9,7 @@ async function routes (fastify, options) {
         return brands
     })
 
-    fastify.get('/notes/:id', (req, reply) => {
+    fastify.get('/note/:id', (req, reply) => {
         fastify.pg.query(
             'SELECT id, author, name, info, completed FROM notes WHERE id=$1;', [req.params.id],
             function onResult (err, result) {
@@ -18,7 +18,7 @@ async function routes (fastify, options) {
         )
     })
 
-    fastify.get('/note', (req, reply) => {
+    fastify.get('/notes', (req, reply) => {
         fastify.pg.query(
             'SELECT * FROM notes;',
             function onResult (err, result) {
@@ -28,5 +28,4 @@ async function routes (fastify, options) {
     })
 
 }
-
 export default routes
