@@ -27,5 +27,14 @@ async function routes (fastify, options) {
         )
     })
 
+    fastify.get('/users', (req, reply) => {
+        fastify.pg.query(
+            'SELECT * FROM users;',
+            function onResult (err, result) {
+                reply.send(err || result.rows)
+            }
+        )
+    })
+
 }
 export default routes

@@ -4,11 +4,13 @@
 import Fastify from 'fastify'
 import dbConnector from './db.js'
 import testRoute from './testRoute.js'
+import cors from '@fastify/cors'
 
 const fastify = Fastify({
   logger: true
 })
 
+fastify.register(cors)
 fastify.register(dbConnector)
 fastify.register(testRoute)
 
