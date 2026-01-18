@@ -36,5 +36,16 @@ async function routes (fastify, options) {
         )
     })
 
+    fastify.post('/register', (req, reply) => {
+        const { username, email, password } = req.body;
+
+        fastify.pg.query(
+            'insert into users (username, email, password) VALUES ($1, $2, $3);', [username, email, password],
+            function onResult (err, result) {
+                reply.send(err || result)
+            }
+        )
+    })
+
 }
 export default routes
