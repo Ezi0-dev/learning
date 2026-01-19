@@ -1,3 +1,5 @@
+import 'dotenv/config'
+
 async function routes (fastify, options) {
     const brands =  [ "Nvidia", "Amd" ]
 
@@ -62,7 +64,7 @@ async function routes (fastify, options) {
                 reply.status(401).send({ error: "Invalid username or password" });
             }
 
-
+            console.log(process.env.SECRET);
 
 
             //console.log(rows[0]);
