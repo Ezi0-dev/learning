@@ -1,0 +1,27 @@
+.flex {
+  margin: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#registerForm  {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+#registerForm  input {
+  font-size: 1.5rem;
+}
+
+#loginForm  {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+#loginForm  input {
+  font-size: 1.5rem;
+}
+

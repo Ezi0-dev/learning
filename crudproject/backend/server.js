@@ -7,6 +7,7 @@ import testRoute from './testRoute.js'
 import cors from '@fastify/cors'
 
 const fastify = Fastify({
+  trustProxy: true,
   logger: true
 })
 
