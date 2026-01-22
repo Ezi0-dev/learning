@@ -5,6 +5,8 @@ import Fastify from 'fastify'
 import dbConnector from './db.js'
 import testRoute from './testRoute.js'
 import cors from '@fastify/cors'
+import jwt from '@fastify/jwt'
+import dotenv from 'dotenv'
 
 const fastify = Fastify({
   trustProxy: true,
@@ -12,6 +14,8 @@ const fastify = Fastify({
 })
 
 fastify.register(cors)
+fastify.register(jwt, { secret: process.env.JWT_SECRET })
+
 fastify.register(dbConnector)
 fastify.register(testRoute)
 
