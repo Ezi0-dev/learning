@@ -1,4 +1,5 @@
 import 'dotenv/config'
+import argon2 from 'argon2'
 
 async function routes (fastify, options) {
     const brands =  [ "Nvidia", "Amd" ]
@@ -38,16 +39,23 @@ async function routes (fastify, options) {
         )
     })
 
-    fastify.post('/register', (req, reply) => {
+    fastify.post('/register', async (req, reply) => {
         const ip = req.ip;
         const { username, email, password } = req.body;
 
-        fastify.pg.query(
-            'insert into users (username, email, password, ip_address) VALUES ($1, $2, $3, $4);', [username, email, password, ip],
-            function onResult (err, result) {
-                reply.send(err || result)
-            }
-        )
+        try {
+            const password_hash = await argon2.hash(password)
+
+            fastify.pg.query(
+                'insert into users (username, email, password, ip_address) VALUES ($1, $2, $3, $4);', [username, email, password_hash, ip],
+                function onResult (err, result) {
+                    reply.send(err || result)
+                }
+            )
+
+        } catch (err) {
+            console.log(err);
+        }
     })
 
     fastify.post('/login', async (req, reply) => {
@@ -60,7 +68,10 @@ async function routes (fastify, options) {
 
             const user = rows[0];
 
-            if (password !== user.password) {
+            if (await argon2.verify(user.password, password)) {
+                console.log("Success password match !!! 🐼🐼👻👻");
+                
+            } else {
                 reply.status(401).send({ error: "Invalid username or password" });
             }
 
