@@ -53,6 +53,8 @@ async function routes (fastify, options) {
                 }
             )
 
+            
+
         } catch (err) {
             console.log(err);
         }
@@ -70,12 +72,34 @@ async function routes (fastify, options) {
 
             if (await argon2.verify(user.password, password)) {
                 console.log("Success password match !!! 🐼🐼👻👻");
-                
+
+                const accessToken = fastify.jwt.sign(
+                    { id: user.id, email: user.email },
+                    { expiresIn: process.env.ACCESS_TOKEN_EXP}
+                );
+
+                const refreshToken = fastify.jwt.sign(
+                    { id: user.id, },
+                    { expiresIn: process.env.REFRESH_TOKEN_EXP}
+                );
+
+                reply
+                    .setCookie('accessToken', accessToken, {
+                        httpOnly: true,
+                        maxAge: 15 * 60 * 1000 // 15 minutes
+                    })
+                    .setCookie('refreshToken', refreshToken, {
+                        httpOnly: true,
+                        maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+                    })
+                    .send({
+                        message: 'Logged in successfully',
+                        user: { id: user.id, username: user.username, email: user.email }
+                    });
+
             } else {
                 reply.status(401).send({ error: "Invalid username or password" });
             }
-
-            console.log(process.env.SECRET);
 
 
             //console.log(rows[0]);

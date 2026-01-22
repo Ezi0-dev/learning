@@ -95,10 +95,11 @@ function App() {
 
       fetch("http://localhost:3000/login", {
         method: "POST",
+        credentials: 'include',
         headers: {
           "Content-Type": "Application/JSON",
         },
-        body: JSON.stringify(userInfo),
+        body: JSON.stringify(userInfo)
       })
 
       setUsername("");
