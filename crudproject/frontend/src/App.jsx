@@ -1,8 +1,13 @@
 import { useState } from 'react'
+import api from './js/api.js'
 import './App.css'
 
 function App() {
-    const [isLogin, setIsLogin] = useState(false); // start with register
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [view, setView] = useState('login');
+
+  const [isLogin, setIsLogin] = useState(false); // start with register
 
   return (
       <div>
@@ -83,24 +88,21 @@ function App() {
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
 
-    function loginUser(e) {
+    async function loginUser(e) {
       e.preventDefault();
 
-      const userInfo = {
-        username: username,
-        password: password
+      console.log(username, password)
+
+      try {
+        const data = await api.login(username, password)
+
+        localStorage.setItem('user', JSON.stringify(data.user))
+
+      } catch (err) {
+        console.log(err)
+
       }
-
-      console.log(userInfo)
-
-      fetch("http://localhost:3000/login", {
-        method: "POST",
-        credentials: 'include',
-        headers: {
-          "Content-Type": "Application/JSON",
-        },
-        body: JSON.stringify(userInfo)
-      })
+      
 
       setUsername("");
       setPassword("");
