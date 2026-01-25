@@ -5,6 +5,8 @@ async function routes (fastify, options) {
     const brands =  [ "Nvidia", "Amd" ]
 
     fastify.get('/', async (req, reply) => {
+        console.log()
+        fastify.authenticate(req)
         return { hello: 'world' }
     })
 
@@ -60,6 +62,13 @@ async function routes (fastify, options) {
         }
     })
 
+    fastify.get('/me', (req, reply) => {
+
+
+        fastify.authenticate(req)
+        
+    }) 
+
     fastify.post('/login', async (req, reply) => {
         const { username, password } = req.body;
 
@@ -82,7 +91,7 @@ async function routes (fastify, options) {
                     { id: user.id, },
                     { expiresIn: process.env.REFRESH_TOKEN_EXP}
                 );
-
+                
                 reply
                     .setCookie('accessToken', accessToken, {
                         httpOnly: true,
@@ -100,12 +109,11 @@ async function routes (fastify, options) {
                         message: 'Logged in successfully',
                         user: { id: user.id, username: user.username, email: user.email }
                     });
-
             } else {
                 reply.status(401).send({ error: "Invalid username or password" });
             }
 
-
+            
             //console.log(rows[0]);
 
         } catch (err)  {
@@ -114,4 +122,5 @@ async function routes (fastify, options) {
     })
 
 }
+
 export default routes

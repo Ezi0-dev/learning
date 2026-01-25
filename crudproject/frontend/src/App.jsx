@@ -7,6 +7,14 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [view, setView] = useState('login');
 
+  fetch("http://localhost:3000/", {
+    method: "GET",
+    credentials: 'include',
+    headers: {
+      "Content-Type": "Application/JSON",
+    },
+  })
+
   const [isLogin, setIsLogin] = useState(false); // start with register
 
   return (
@@ -102,7 +110,6 @@ function App() {
         console.log(err)
 
       }
-      
 
       setUsername("");
       setPassword("");

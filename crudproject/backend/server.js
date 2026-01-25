@@ -3,6 +3,7 @@
 // ESM
 import Fastify from 'fastify'
 import dbConnector from './db.js'
+import fp from 'fastify-plugin'
 import testRoute from './testRoute.js'
 import cors from '@fastify/cors'
 import jwt from '@fastify/jwt'
@@ -20,7 +21,29 @@ fastify.register(cors, {
 });
 
 fastify.register(cookie);
-fastify.register(jwt, { secret: process.env.JWT_SECRET });
+fastify.register(jwt, { secret: process.env.JWT_SECRET, 
+  cookie: {
+  cookieName: 'accessToken',
+  signed: false
+  }   
+});
+ 
+
+fastify.decorate('authenticate', async function(req, reply) {
+    try {
+
+        console.log("🐼🐼🐼 AUTHENTICATE FUNCTION RUNNING 🐼🐼🐼")
+
+        //console.log(req.cookies)
+
+        await req.jwtVerify()
+
+        console.log(req.user, "Authenticated successfully")
+
+    } catch (err) {
+        console.log(err)
+    }
+})
 
 fastify.register(dbConnector);
 fastify.register(testRoute);
