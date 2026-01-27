@@ -23,7 +23,7 @@ fastify.register(cors, {
 fastify.register(cookie);
 fastify.register(jwt, { secret: process.env.JWT_SECRET, 
   cookie: {
-  cookieName: 'accessToken',
+  cookieName: 'refreshToken',
   signed: false
   }   
 });

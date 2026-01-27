@@ -62,7 +62,7 @@ async function routes (fastify, options) {
         }
     })
 
-    fastify.get('/me', (req, reply) => {
+    fastify.get('/me', async (req, reply) => {
 
 
         fastify.authenticate(req)
@@ -93,12 +93,6 @@ async function routes (fastify, options) {
                 );
                 
                 reply
-                    .setCookie('accessToken', accessToken, {
-                        httpOnly: true,
-                        secure: process.env.NODE_ENV === 'production',
-                        sameSite: 'strict',
-                        maxAge: 15 * 60 * 1000 // 15 minutes
-                    })
                     .setCookie('refreshToken', refreshToken, {
                         httpOnly: true,
                         secure: process.env.NODE_ENV === 'production',
@@ -107,7 +101,8 @@ async function routes (fastify, options) {
                     })
                     .send({
                         message: 'Logged in successfully',
-                        user: { id: user.id, username: user.username, email: user.email }
+                        user: { id: user.id, username: user.username, email: user.email },
+                        accessToken
                     });
             } else {
                 reply.status(401).send({ error: "Invalid username or password" });

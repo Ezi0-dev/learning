@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import api from './js/api.js'
+import { AuthProvider, useAuth } from './js/authContext.jsx'
 import './App.css'
 
 function App() {
@@ -7,7 +8,7 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [view, setView] = useState('login');
 
-  fetch("http://localhost:3000/", {
+  fetch("http://localhost:3000/me", {
     method: "GET",
     credentials: 'include',
     headers: {
@@ -19,12 +20,14 @@ function App() {
 
   return (
       <div>
+        <AuthProvider>
         <div className="flex">
           <button onClick={() => setIsLogin(true)}>Login</button>
           <button onClick={() => setIsLogin(false)}>Register</button>
         </div>
 
         {isLogin ? <LoginForm /> : <RegisterForm />}
+        </AuthProvider>
       </div>
     );
   }
@@ -95,6 +98,7 @@ function App() {
   function LoginForm() {
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
+    const { setAccessToken } = useAuth()
 
     async function loginUser(e) {
       e.preventDefault();
@@ -104,11 +108,12 @@ function App() {
       try {
         const data = await api.login(username, password)
 
+        setAccessToken(data.accessToken)
+
         localStorage.setItem('user', JSON.stringify(data.user))
 
       } catch (err) {
         console.log(err)
-
       }
 
       setUsername("");

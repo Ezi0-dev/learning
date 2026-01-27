@@ -31,6 +31,15 @@ const api = {
         });
 
         return response;
+    },
+
+    async me() {
+
+        const response = await this.request("/me", {
+            method: "GET"
+        })
+
+        return response;
     }
 };
 
