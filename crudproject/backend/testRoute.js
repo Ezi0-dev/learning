@@ -55,17 +55,71 @@ async function routes (fastify, options) {
                 }
             )
 
-            
-
         } catch (err) {
             console.log(err);
         }
     })
 
+    fastify.post('/refresh', async (req, reply) => {
+        const refreshToken = req.cookies.refreshToken
+
+        console.log(req.cookies)
+
+        if (!refreshToken) {
+            return reply.code(401).send({ error: 'No refresh token provided' })
+        }
+
+        try {
+            // Authenticates the refreshToken
+
+            fastify.authenticate(req)
+
+            const result = await fastify.pg.query('SELECT id, username, email FROM users WHERE id = $1;', [req.user.id])
+
+            const user = result.rows[0]
+                
+            console.log("! /REFRESH ROUTE IN USE !")
+
+            // New token gets generated
+            const accessToken = fastify.jwt.sign(
+                { id: user.id, email: user.email },
+                { expiresIn: process.env.ACCESS_TOKEN_EXP}
+            );  
+
+            return reply.send({
+                accessToken,
+                user: {
+                    id: user.id,
+                    email: user.email,
+                    username: user.username
+                }
+            });
+        } catch (err) {
+            console.log(err)
+            return reply.code(401).send({ error: 'Invalid refresh token' })
+        }
+    })
+
     fastify.get('/me', async (req, reply) => {
+        const authHeader = req.headers.authorization
 
+        const token = authHeader.replace('Bearer', '')
 
-        fastify.authenticate(req)
+        console.log("/me route token is : ", token)
+
+        try {
+            const decoded = jwt.verify(token, process.env.JWT_SECRET)
+
+            reply.send({
+                user: {
+                    id: user.id,
+                    email: user.email,
+                    username: user.username
+                }
+            })
+        } catch (err) {
+            return reply.code(401).reply.send({ error: 'Invalid token' })
+        }
         
     }) 
 

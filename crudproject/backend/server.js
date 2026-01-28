@@ -38,7 +38,7 @@ fastify.decorate('authenticate', async function(req, reply) {
 
         await req.jwtVerify()
 
-        console.log(req.user, "Authenticated successfully")
+        //console.log(req.user, "RefreshToken authenticated successfully")
 
     } catch (err) {
         console.log(err)

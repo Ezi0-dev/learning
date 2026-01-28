@@ -7,14 +7,8 @@ function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [view, setView] = useState('login');
+  const { setAccessToken } = useAuth()
 
-  fetch("http://localhost:3000/me", {
-    method: "GET",
-    credentials: 'include',
-    headers: {
-      "Content-Type": "Application/JSON",
-    },
-  })
 
   const [isLogin, setIsLogin] = useState(false); // start with register
 
