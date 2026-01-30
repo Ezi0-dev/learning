@@ -4,24 +4,24 @@ import { AuthProvider, useAuth } from './js/authContext.jsx'
 import './App.css'
 
 function App() {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [view, setView] = useState('login');
-  const { setAccessToken } = useAuth()
-
-
+  const { accessToken, user, loading } = useAuth();
   const [isLogin, setIsLogin] = useState(false); // start with register
+
+  console.log("in app", accessToken)
+  console.log("in app", user)
+
+  if (loading) return <LoadingSpinner />;
 
   return (
       <div>
-        <AuthProvider>
         <div className="flex">
           <button onClick={() => setIsLogin(true)}>Login</button>
           <button onClick={() => setIsLogin(false)}>Register</button>
+          <button>Dashboard</button>
         </div>
 
         {isLogin ? <LoginForm /> : <RegisterForm />}
-        </AuthProvider>
       </div>
     );
   }

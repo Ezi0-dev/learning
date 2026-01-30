@@ -60,7 +60,7 @@ async function routes (fastify, options) {
         }
     })
 
-    fastify.post('/refresh', async (req, reply) => {
+    fastify.get('/refresh', async (req, reply) => {
         const refreshToken = req.cookies.refreshToken
 
         console.log(req.cookies)
@@ -84,7 +84,7 @@ async function routes (fastify, options) {
             const accessToken = fastify.jwt.sign(
                 { id: user.id, email: user.email },
                 { expiresIn: process.env.ACCESS_TOKEN_EXP}
-            );  
+            );
 
             return reply.send({
                 accessToken,

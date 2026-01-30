@@ -47,7 +47,7 @@ const api = {
     async refresh() {
 
         const response = await this.request("/refresh", {
-            method: "POST",
+            method: "GET",
             credentials: 'include'
         })
 

@@ -5,30 +5,34 @@ const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
     const [accessToken, setAccessToken] = useState(null);
+    const [loading, setLoading] = useState(true);
     const [user, setUser] = useState(null);
-
-    console.log("Token successfully set : ", accessToken);  
 
     useEffect(() => {
         const fetchMe = async () => {
             try {
                 const response = await api.refresh()
-                setAccessToken(response.data.accessToken)
-                setUser(response.data.user)
+                setAccessToken(response.accessToken)
+                
+                setUser(response.user.username)
             } catch {
                 setAccessToken(null)
+            } finally {
+                setLoading(false);
+                
             }
         }
-
         fetchMe();
     }, [])
 
-    useLayoutEffect(() => {
-
-    })
+    useEffect(() => {
+        if (accessToken) {
+            console.log("Token successfully set:", accessToken);
+        }
+    }, [accessToken]);
 
     return (
-        <AuthContext.Provider value={{ accessToken, setAccessToken }}>
+        <AuthContext.Provider value={{ accessToken, setAccessToken, user }}>
         {children}
         </AuthContext.Provider>
     );

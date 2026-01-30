@@ -5,9 +5,10 @@ import './index.css'
 import App from './App.jsx'
 
 createRoot(document.getElementById('root')).render(
-  <AuthProvider>
-    <StrictMode>
+  <StrictMode>
+    <AuthProvider>
       <App />
-    </StrictMode>,
-  </AuthProvider>
+    </AuthProvider>
+  </StrictMode>
+  
 )
