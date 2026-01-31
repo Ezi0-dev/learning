@@ -8,7 +8,7 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
     const [user, setUser] = useState(null);
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         const fetchMe = async () => {
             try {
                 const response = await api.refresh()

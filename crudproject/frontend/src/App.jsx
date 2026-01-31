@@ -1,143 +1,29 @@
 import { useEffect, useState } from 'react'
+import { Routes, Route, Navigate } from 'react-router-dom';
 import api from './js/api.js'
 import { AuthProvider, useAuth } from './js/authContext.jsx'
+import ProtectedRoute from './js/helpers.jsx'
+import RegisterPage from './pages/registerPage.jsx';
+import HomePage from './pages/homePage.jsx';
+import LoginPage from './pages/loginPage.jsx';
+import Dashboard from './pages/dashboard.jsx';
 import './App.css'
 
 function App() {
-  const [view, setView] = useState('login');
-  const { accessToken, user, loading } = useAuth();
-  const [isLogin, setIsLogin] = useState(false); // start with register
-
-  console.log("in app", accessToken)
-  console.log("in app", user)
-
-  if (loading) return <LoadingSpinner />;
 
   return (
-      <div>
-        <div className="flex">
-          <button onClick={() => setIsLogin(true)}>Login</button>
-          <button onClick={() => setIsLogin(false)}>Register</button>
-          <button>Dashboard</button>
-        </div>
-
-        {isLogin ? <LoginForm /> : <RegisterForm />}
-      </div>
+    <Routes>
+      <Route path="/home" element={<HomePage />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
+      <Route path="/dashboard" element={
+                <ProtectedRoute>
+                    <Dashboard />
+                </ProtectedRoute>
+            } />
+      <Route path="/" element={<Navigate to="/home" replace />} />
+    </Routes>
     );
-  }
-
-  function RegisterForm() {
-    const [username, setUsername] = useState('')
-    const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
-
-    function registerUser(e) {
-      e.preventDefault();
-
-      const userInfo = {
-        username: username,
-        email: email,
-        password: password
-      }
-
-      console.log(userInfo)
-
-      fetch("http://localhost:3000/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "Application/JSON",
-        },
-        body: JSON.stringify(userInfo),
-      })
-
-      setUsername("");
-      setEmail("");
-      setPassword("");
-    }
-
-    return (
-      <>
-        <div className="flex">
-        <form id="registerForm" onSubmit={registerUser}>
-          <input 
-            type="text"
-            id="username"
-            placeholder="Userame"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
-
-          <input 
-            type="email"
-            id="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-
-          <input 
-            type="password"
-            id="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          <input type='submit' value="Register"/>
-        </form>
-        </div>
-      </>
-    )
-  }
-
-  function LoginForm() {
-    const [username, setUsername] = useState('')
-    const [password, setPassword] = useState('')
-    const { setAccessToken } = useAuth()
-
-    async function loginUser(e) {
-      e.preventDefault();
-
-      console.log(username, password)
-
-      try {
-        const data = await api.login(username, password)
-
-        setAccessToken(data.accessToken)
-
-        localStorage.setItem('user', JSON.stringify(data.user))
-
-      } catch (err) {
-        console.log(err)
-      }
-
-      setUsername("");
-      setPassword("");
-    }
-
-    return (
-      <>
-        <div className="flex">
-        <form id="loginForm" onSubmit={loginUser}>
-          <input 
-            type="text"
-            id="username"
-            placeholder="Userame"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
-
-          <input 
-            type="password"
-            id="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          <input type='submit' value="Login"/>
-        </form>
-        </div>
-      </>
-    )
-  }
+}
 
 export default App
