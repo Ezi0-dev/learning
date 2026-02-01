@@ -1,16 +1,19 @@
 import { useState } from 'react';
-import { useNavigate, Navigate, Link } from 'react-router-dom';
+import { useNavigate, Navigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../js/authContext';
 import api from '../js/api';
 
 
 export default function LoginPage() {
+    const location = useLocation()
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
+    const [error, setError] = useState(location.state?.error || '')
     const { setAccessToken } = useAuth()
 
     async function loginUser(e) {
       e.preventDefault();
+      setError('')
 
       console.log(username, password)
 
@@ -22,6 +25,7 @@ export default function LoginPage() {
         localStorage.setItem('user', JSON.stringify(data.user))
 
       } catch (err) {
+        setError(err.respone?.data?.message || 'Login failed')
         console.log(err)
       }
 
@@ -31,12 +35,13 @@ export default function LoginPage() {
 
     return (
       <>
+      {error && <div className="error">{error}</div>}
         <div className="login-container">
             <form id="loginForm" onSubmit={loginUser}>
             <input 
                 type="text"
                 id="username"
-                placeholder="Userame"
+                placeholder="Username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
             />

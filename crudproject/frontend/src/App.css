@@ -25,3 +25,19 @@
   font-size: 1.5rem;
 }
 
+.homepage-container {
+  padding-bottom: 10px;
+  flex-direction: row;
+  display: flex;
+  justify-content: space-between;
+}
+
+.error {
+  border: solid 3px rgba(239, 0, 0, 0.666);
+  background-color: rgba(130, 0, 0, 0.35);
+  border-radius: 8px;
+  margin-bottom: 10px;
+  font-weight: bold;
+  font-size: 1.5rem;
+  padding: 5px;
+}

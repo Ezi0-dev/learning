@@ -7,7 +7,7 @@ export default function ProtectedRoute({ children }) {
     if (loading) return <LoadingSpinner />;
 
     if (!accessToken || !user) {
-        return <Navigate to="/login" replace />;
+        return <Navigate to="/login" state={{ error: 'You need to be logged in to access the dashboard!' }} replace />;
     }
 
     return children
