@@ -33,7 +33,11 @@ export default function RegisterPage() {
 
     return (
       <>
+      <div className="component-container">
         <div className="register-container">
+            
+            <h1>Register</h1>
+
             <form id="registerForm" onSubmit={registerUser}>
             <input 
                 type="text"
@@ -61,6 +65,7 @@ export default function RegisterPage() {
             <input type='submit' value="Register"/>
             </form>
         </div>
+      </div>
       </>
     )
 }

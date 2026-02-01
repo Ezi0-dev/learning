@@ -5,7 +5,7 @@ export default function Dashboard() {
 
     return (
         <>
-         <div className="register-container">
+         <div className="dashboard-container">
             <h1>Hello {user} </h1>
 
          </div>

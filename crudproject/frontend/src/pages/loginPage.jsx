@@ -33,8 +33,12 @@ export default function LoginPage() {
     return (
       <>
       {error && <div className="error">{error}</div>}
+      <div className="component-container">
         <div className="login-container">
+            <h1>Login</h1>
+
             <form id="loginForm" onSubmit={loginUser}>
+                
             <input 
                 type="text"
                 id="username"
@@ -53,6 +57,7 @@ export default function LoginPage() {
             <input type='submit' value="Login"/>
             </form>
         </div>
+      </div>
       </>
     )
   }

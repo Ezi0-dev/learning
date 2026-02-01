@@ -14,18 +14,22 @@ function App() {
 
   return (
     <>
-      <Navbar />
-        <Routes>
-          <Route path="/home" element={<HomePage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/dashboard" element={
-                    <ProtectedRoute>
-                        <Dashboard />
-                    </ProtectedRoute>
-                } />
-          <Route path="/" element={<Navigate to="/home" replace />} />
-        </Routes>
+    <div className="wrapper">
+      <div className="wrapper-container">
+        <Navbar />
+          <Routes>
+            <Route path="/home" element={<HomePage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/dashboard" element={
+                      <ProtectedRoute>
+                          <Dashboard />
+                      </ProtectedRoute>
+                  } />
+            <Route path="/" element={<Navigate to="/home" replace />} />
+          </Routes>
+        </div>
+    </div>
     </>
     );
 }

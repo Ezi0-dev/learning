@@ -19,17 +19,18 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+  text-align: center;
+}
+
+.login-container, .register-container {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  gap: 10px;
 }
 
 #loginForm  input {
   font-size: 1.5rem;
-}
-
-.homepage-container {
-  padding-bottom: 10px;
-  flex-direction: row;
-  display: flex;
-  justify-content: space-between;
 }
 
 .error {
@@ -40,4 +41,51 @@
   font-weight: bold;
   font-size: 1.5rem;
   padding: 5px;
+}
+
+.navbar-container {
+  flex-direction: row;
+  display: flex;
+  gap: 20px;
+  justify-content: space-between;
+  padding: 20px 0px;
+  margin: 10px 10px;
+  background-color: #1717177e;
+  border-radius: 10px;
+}
+
+.navbar-left {
+  font-size: 2rem;
+  padding-left: 20px;
+  margin: auto 0;
+}
+
+.navbar-right {
+  padding-right: 20px;
+}
+
+.navbar-container button {
+  padding: 20px;
+  font-size: 1.5rem;
+  border-radius: 10px;
+  border: solid #2e2e2ea1 1px;
+  background-color: #3c3c3c;
+  cursor: pointer;
+}
+
+.navbar-container button:hover {
+  padding: 20px;
+  font-size: 1.5rem;
+  border-radius: 10px;
+  border: solid #ffffff 1px;
+  background-color: #3c3c3c;
+  cursor: pointer;
+}
+
+.component-container {
+  margin: 10px 10px;
+  padding: 20px;
+  border-radius: 10px;
+  display: flex;
+  justify-content: center;
 }
