@@ -19,7 +19,6 @@ export const AuthProvider = ({ children }) => {
                 setAccessToken(null)
             } finally {
                 setLoading(false);
-                
             }
         }
         fetchMe();
@@ -32,7 +31,7 @@ export const AuthProvider = ({ children }) => {
     }, [accessToken]);
 
     return (
-        <AuthContext.Provider value={{ accessToken, setAccessToken, user }}>
+        <AuthContext.Provider value={{ accessToken, setAccessToken, setUser, user, loading }}>
         {children}
         </AuthContext.Provider>
     );

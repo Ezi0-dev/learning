@@ -9,20 +9,17 @@ export default function LoginPage() {
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const [error, setError] = useState(location.state?.error || '')
-    const { setAccessToken } = useAuth()
+    const { setAccessToken, setUser } = useAuth()
 
     async function loginUser(e) {
       e.preventDefault();
       setError('')
 
-      console.log(username, password)
-
       try {
-        const data = await api.login(username, password)
+        const response = await api.login(username, password)
 
-        setAccessToken(data.accessToken)
-
-        localStorage.setItem('user', JSON.stringify(data.user))
+        setAccessToken(response.accessToken)
+        setUser(response.user.username)
 
       } catch (err) {
         setError(err.respone?.data?.message || 'Login failed')
