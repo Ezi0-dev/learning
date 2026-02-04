@@ -123,6 +123,19 @@ async function routes (fastify, options) {
         
     }) 
 
+    fastify.post('/notes', async (req, reply) => {
+        const { user, title, content } = req.body
+
+        try {
+            await fastify.pg.query('INSERT INTO notes ("user", title, content) VALUES ($1, $2, $3);', [user, title, content])
+            
+            reply.send({ message: "Note created successfully!" })
+        } catch(err) {
+            reply.send(err)
+            console.log(err)
+        }
+    })
+
     fastify.post('/login', async (req, reply) => {
         const { username, password } = req.body;
 

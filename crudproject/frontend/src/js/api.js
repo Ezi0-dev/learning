@@ -52,6 +52,17 @@ const api = {
         })
 
         return response;
+    },
+
+    async createNote(user, title, content) {
+
+        const response = await this.request("/notes", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ user, title, content })
+        })
+
+        return response
     }
 };
 
