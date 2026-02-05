@@ -22,7 +22,7 @@ body {
   min-height: 100vh;
 }
 
-h1 {
+h1, h2 {
   margin: 0;
   padding: 0;
 }
@@ -38,9 +38,10 @@ h1 {
 
 .wrapper-container {
   background-color: #242424;
-  width: fit-content;
+  display: flex;
+  flex-direction: column;
   height: 90vh;
-  width: 190vh;
+  min-width: 100vh;
   border-radius: 20px;
   border: solid #1717177e 5px;
 }

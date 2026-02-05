@@ -21,21 +21,34 @@ export default function Dashboard() {
         <>
          <div className="dashboard-container">
             <h1>Hello {user} </h1>
-            <form id="createNoteForm" onSubmit={createNote}>
-                <input 
-                id="title" 
-                type="text" 
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}></input>
+            <div className="noteform-container">
+                <h2>Create a note</h2>
+                <form id="createNoteForm" onSubmit={createNote}>
+                    <input 
+                    id="title" 
+                    type="text" 
+                    placeholder="Title"
+                    required
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}></input>
 
-                <input 
-                id="content" 
-                type="text" 
-                value={content}
-                onChange={(e) => setContent(e.target.value)}></input>
+                    <input 
+                    id="content" 
+                    type="text"
+                    placeholder="Content" 
+                    required
+                    value={content}
+                    onChange={(e) => setContent(e.target.value)}></input>
 
-                <input type='submit' value="Create Note"/>
-            </form>
+                    <input type='submit' value="Create Note"/>
+                </form>
+            </div>
+            <div className="notes-container">
+                <h2>Notes:</h2>
+                <lu>
+
+                </lu>
+            </div>
          </div>
         </>
     )
