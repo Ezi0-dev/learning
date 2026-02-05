@@ -14,22 +14,24 @@ async function routes (fastify, options) {
         return brands
     })
 
-    fastify.get('/note/:id', (req, reply) => {
-        fastify.pg.query(
-            'SELECT id, author, name, info, completed FROM notes WHERE id=$1;', [req.params.id],
-            function onResult (err, result) {
-                reply.send(err || result.rows)
-            }
-        )
+    fastify.get('/notes/:id', async (req, reply) => {
+        try {
+            const result = await fastify.pg.query('SELECT id, user, title, content FROM notes WHERE id = $1;', [req.params.id])
+
+            reply.send(result.rows)
+        } catch (err) {
+            reply.status(500).send({ error: err.message })
+        }
     })
 
-    fastify.get('/notes', (req, reply) => {
-        fastify.pg.query(
-            'SELECT * FROM notes;',
-            function onResult (err, result) {
-                reply.send(err || result.rows)
-            }
-        )
+    fastify.get('/notes', (reply) => {
+        try {
+            const result = fastify.pg.query('SELECT * FROM notes;')
+                        
+            reply.send(result.rows)
+        } catch (err) {
+            reply.status(500).send({ error: err.message })
+        }
     })
 
     fastify.get('/users', (req, reply) => {
