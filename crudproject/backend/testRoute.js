@@ -14,9 +14,14 @@ async function routes (fastify, options) {
         return brands
     })
 
-    fastify.get('/notes/:id', async (req, reply) => {
+    fastify.get('/notes', async (req, reply) => {
         try {
-            const result = await fastify.pg.query('SELECT id, user, title, content FROM notes WHERE id = $1;', [req.params.id])
+
+            fastify.authenticate(req)
+
+            console.log(req.user)
+
+            const result = await fastify.pg.query('SELECT "user", title, content FROM notes WHERE "user" = $1;', [req.user.username])
 
             reply.send(result.rows)
         } catch (err) {
@@ -24,7 +29,7 @@ async function routes (fastify, options) {
         }
     })
 
-    fastify.get('/notes', (reply) => {
+    fastify.get('/allnotes', (reply) => {
         try {
             const result = fastify.pg.query('SELECT * FROM notes;')
                         
@@ -140,7 +145,7 @@ async function routes (fastify, options) {
 
     fastify.post('/login', async (req, reply) => {
         const { username, password } = req.body;
-
+        
         try {
             const { rows } = await fastify.pg.query(
                 'SELECT id, username, email, password, ip_address FROM users WHERE username = $1;', [username]

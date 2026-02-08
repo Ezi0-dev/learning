@@ -1,11 +1,26 @@
 import { useAuth } from "../js/authContext";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import api from "../js/api";
 
 export default function Dashboard() {
     const { user } = useAuth()
     const [title, setTitle] = useState('')
     const [content, setContent] = useState('')
+    const [ntoes, setNotes] = useState([])
+
+    useEffect(() => {
+    const getNotes = async() => {
+        try {
+            const response = api.getNotes()
+
+            setNotes(response)
+            } catch (err) {
+                console.log(err)
+            }
+        }
+
+        getNotes()
+    }, [])
  
     async function createNote(e) {
         e.preventDefault()
@@ -45,9 +60,9 @@ export default function Dashboard() {
             </div>
             <div className="notes-container">
                 <h2>Notes:</h2>
-                <lu>
+                <li>
 
-                </lu>
+                </li>
             </div>
          </div>
         </>

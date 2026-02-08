@@ -1,69 +1,43 @@
 const API_URL = "http://localhost:3000"
 
-const api = {
-    async request(endpoint, options = {}) {
 
-        const config = {
-            ...options,
-            credentials: 'include',
-            headers: { ...options.headers }
-        };
-
-        try {
-            const response = await fetch(`${API_URL}${endpoint}`, config);
-            console.log(response)
-            const data = await response.json();
-
-            console.log(data)
-            return data;
-
-        } catch (err) {
-            console.error(err);
-        }
-    },
-
-    async login(username, password) {
-
-        const response = await this.request("/login", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ username, password })
-        });
-
-        return response;
-    },
-
-    async me(token) {
-
-        console.log("ME ROUTE TOKEN IS :", token)
-
-        const response = await this.request("/me", {
-            method: "GET",
-        })
-
-        return response;
-    },
-
-    async refresh() {
-
-        const response = await this.request("/refresh", {
-            method: "GET",
-            credentials: 'include'
-        })
-
-        return response;
-    },
-
-    async createNote(user, title, content) {
-
-        const response = await this.request("/notes", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ user, title, content })
-        })
-
-        return response
+class API {
+    constructor() {
+        this.baseURL = API_URL
+        this.token = null
     }
-};
 
-export default api;
+    setToken(token) {
+        this.token = token
+    }
+
+    async get(endpoint) {
+        const response = await fetch(`${this.baseURL}${endpoint}`, {
+            method: 'GET',
+            credentials: 'include',
+            headers: { 'Authorization': `Bearer ${this.token}` }
+        })
+
+        if (!response.ok) throw new Error(`HTTP ${response.status}`)
+        return response.json()
+    }
+
+    async post(endpoint, body) {
+        const response = await fetch(`${this.baseURL}${endpoint}`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${this.token}`
+            },
+            body: JSON.stringify(body)
+        })
+
+        console.log("this is body : ", body)
+        if (!response.ok) throw new Error(`HTTP ${response.status}`)
+        return response.json()
+    }
+
+}
+
+export default new API;

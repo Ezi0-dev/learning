@@ -11,9 +11,14 @@ export const AuthProvider = ({ children }) => {
     useLayoutEffect(() => {
         const fetchMe = async () => {
             try {
-                const response = await api.refresh()
-                setAccessToken(response.accessToken)
-                
+                const response = await api.get('/refresh')
+
+                console.log(response)
+                const token = response.accessToken
+
+                api.setToken(token)
+
+                setAccessToken(token)
                 setUser(response.user.username)
             } catch {
                 setAccessToken(null)
@@ -25,6 +30,7 @@ export const AuthProvider = ({ children }) => {
     }, [])
 
     useEffect(() => {
+        api.setToken(accessToken);
         if (accessToken) {
             console.log("Token successfully set:", accessToken);
         }

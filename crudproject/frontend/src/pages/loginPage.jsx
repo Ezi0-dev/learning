@@ -16,10 +16,13 @@ export default function LoginPage() {
       setError('')
 
       try {
-        const response = await api.login(username, password)
+        const response = await api.post('/login', { username, password })
 
         setAccessToken(response.accessToken)
+        api.setToken(response.accessToken)
         setUser(response.user.username)
+
+        Navigate('/dashboard')
 
       } catch (err) {
         setError(err.respone?.data?.message || 'Login failed')
@@ -38,7 +41,7 @@ export default function LoginPage() {
             <h1>Login</h1>
 
             <form id="loginForm" onSubmit={loginUser}>
-                
+
             <input 
                 type="text"
                 id="username"

@@ -5,6 +5,7 @@ import Fastify from 'fastify'
 import dbConnector from './db.js'
 import fp from 'fastify-plugin'
 import testRoute from './testRoute.js'
+import fastifyFormbody from '@fastify/formbody'
 import cors from '@fastify/cors'
 import jwt from '@fastify/jwt'
 import cookie from '@fastify/cookie'
@@ -17,9 +18,12 @@ const fastify = Fastify({
 
 fastify.register(cors, { 
   origin: 'http://localhost:5173',
-  credentials: true
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 });
 
+fastify.register(fastifyFormbody);
 fastify.register(cookie);
 fastify.register(jwt, { secret: process.env.JWT_SECRET, 
   cookie: {
