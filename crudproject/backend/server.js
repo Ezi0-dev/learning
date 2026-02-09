@@ -5,7 +5,6 @@ import Fastify from 'fastify'
 import dbConnector from './db.js'
 import fp from 'fastify-plugin'
 import testRoute from './testRoute.js'
-import fastifyFormbody from '@fastify/formbody'
 import cors from '@fastify/cors'
 import jwt from '@fastify/jwt'
 import cookie from '@fastify/cookie'
@@ -23,7 +22,6 @@ fastify.register(cors, {
   allowedHeaders: ['Content-Type', 'Authorization']
 });
 
-fastify.register(fastifyFormbody);
 fastify.register(cookie);
 fastify.register(jwt, { secret: process.env.JWT_SECRET, 
   cookie: {
@@ -31,22 +29,37 @@ fastify.register(jwt, { secret: process.env.JWT_SECRET,
   signed: false
   }   
 });
- 
+
+fastify.decorate('authenticateRefresh', async function(req, reply) {
+  try {
+      await req.jwtVerify()
+      console.log("Refresh token verified:", req.user);
+    } catch (err) {
+      return reply.status(401).send({ error: 'Invalid refresh token' });
+  }
+})
 
 fastify.decorate('authenticate', async function(req, reply) {
-    try {
+  try {
+    console.log("🐼🐼🐼 AUTHENTICATE FUNCTION RUNNING 🐼🐼🐼")
 
-        console.log("🐼🐼🐼 AUTHENTICATE FUNCTION RUNNING 🐼🐼🐼")
+    const authHeader = req.headers.authorization
 
-        //console.log(req.cookies)
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.status(401).json({ error: 'No access token provided' });
+    }
 
-        await req.jwtVerify()
+    const accessToken = authHeader.split(' ')[1]
 
-        //console.log(req.user, "RefreshToken authenticated successfully")
+    const decoded = fastify.jwt.verify(accessToken)
+    req.user = decoded
+
+    console.log("Access token verified:", req.user);
 
     } catch (err) {
-        console.log(err)
-    }
+      console.log("Auth error:", err.message);
+      return reply.status(401).send({ error: 'Invalid access token' });
+  }
 })
 
 fastify.register(dbConnector);

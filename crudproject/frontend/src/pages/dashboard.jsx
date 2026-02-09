@@ -6,12 +6,12 @@ export default function Dashboard() {
     const { user } = useAuth()
     const [title, setTitle] = useState('')
     const [content, setContent] = useState('')
-    const [ntoes, setNotes] = useState([])
+    const [notes, setNotes] = useState([])
 
     useEffect(() => {
     const getNotes = async() => {
         try {
-            const response = api.getNotes()
+            const response = api.get('/notes')
 
             setNotes(response)
             } catch (err) {

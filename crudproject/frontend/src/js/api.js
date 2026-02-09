@@ -22,6 +22,17 @@ class API {
         return response.json()
     }
 
+    // Ugly fix imo, can def improve
+    async refresh() {
+        const response = await fetch(`${this.baseURL}/refresh`, {
+            method: 'GET',
+            credentials: 'include'
+        })
+
+        if (!response.ok) throw new Error(`HTTP ${response.status}`)
+        return response.json()
+    }
+
     async post(endpoint, body) {
         const response = await fetch(`${this.baseURL}${endpoint}`, {
             method: 'POST',

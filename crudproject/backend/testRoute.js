@@ -14,12 +14,11 @@ async function routes (fastify, options) {
         return brands
     })
 
-    fastify.get('/notes', async (req, reply) => {
+    fastify.get('/notes', { onRequest: [fastify.authenticate] }, async (req, reply) => {
         try {
 
-            fastify.authenticate(req)
+            console.log('req.user:', req.user); // Check what's here
 
-            console.log(req.user)
 
             const result = await fastify.pg.query('SELECT "user", title, content FROM notes WHERE "user" = $1;', [req.user.username])
 
@@ -67,7 +66,7 @@ async function routes (fastify, options) {
         }
     })
 
-    fastify.get('/refresh', async (req, reply) => {
+    fastify.get('/refresh', { onRequest: [fastify.authenticateRefresh] }, async (req, reply) => {
         const refreshToken = req.cookies.refreshToken
 
         console.log(req.cookies)
@@ -79,8 +78,6 @@ async function routes (fastify, options) {
         try {
             // Authenticates the refreshToken
 
-            fastify.authenticate(req)
-
             const result = await fastify.pg.query('SELECT id, username, email FROM users WHERE id = $1;', [req.user.id])
 
             const user = result.rows[0]
@@ -89,7 +86,7 @@ async function routes (fastify, options) {
 
             // New token gets generated
             const accessToken = fastify.jwt.sign(
-                { id: user.id, email: user.email },
+                { id: user.id, user: user.username, email: user.email },
                 { expiresIn: process.env.ACCESS_TOKEN_EXP}
             );
 
@@ -97,8 +94,8 @@ async function routes (fastify, options) {
                 accessToken,
                 user: {
                     id: user.id,
-                    email: user.email,
-                    username: user.username
+                    username: user.username,
+                    email: user.email
                 }
             });
         } catch (err) {
@@ -145,7 +142,7 @@ async function routes (fastify, options) {
 
     fastify.post('/login', async (req, reply) => {
         const { username, password } = req.body;
-        
+
         try {
             const { rows } = await fastify.pg.query(
                 'SELECT id, username, email, password, ip_address FROM users WHERE username = $1;', [username]
@@ -157,7 +154,7 @@ async function routes (fastify, options) {
                 console.log("Success password match !!! 🐼🐼👻👻");
 
                 const accessToken = fastify.jwt.sign(
-                    { id: user.id, email: user.email },
+                    { id: user.id, user: user.username, email: user.email },
                     { expiresIn: process.env.ACCESS_TOKEN_EXP}
                 );
 

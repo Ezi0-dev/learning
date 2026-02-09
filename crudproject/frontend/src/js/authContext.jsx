@@ -11,7 +11,7 @@ export const AuthProvider = ({ children }) => {
     useLayoutEffect(() => {
         const fetchMe = async () => {
             try {
-                const response = await api.get('/refresh')
+                const response = await api.refresh()
 
                 console.log(response)
                 const token = response.accessToken
