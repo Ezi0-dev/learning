@@ -16,10 +16,6 @@ async function routes (fastify, options) {
 
     fastify.get('/notes', { onRequest: [fastify.authenticate] }, async (req, reply) => {
         try {
-
-            console.log('req.user:', req.user); // Check what's here
-
-
             const result = await fastify.pg.query('SELECT "user", title, content FROM notes WHERE "user" = $1;', [req.user.username])
 
             reply.send(result.rows)
@@ -86,7 +82,7 @@ async function routes (fastify, options) {
 
             // New token gets generated
             const accessToken = fastify.jwt.sign(
-                { id: user.id, user: user.username, email: user.email },
+                { id: user.id, username: user.username, email: user.email },
                 { expiresIn: process.env.ACCESS_TOKEN_EXP}
             );
 
@@ -154,7 +150,7 @@ async function routes (fastify, options) {
                 console.log("Success password match !!! 🐼🐼👻👻");
 
                 const accessToken = fastify.jwt.sign(
-                    { id: user.id, user: user.username, email: user.email },
+                    { id: user.id, username: user.username, email: user.email },
                     { expiresIn: process.env.ACCESS_TOKEN_EXP}
                 );
 

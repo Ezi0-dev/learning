@@ -7,15 +7,17 @@ export default function Dashboard() {
     const [title, setTitle] = useState('')
     const [content, setContent] = useState('')
     const [notes, setNotes] = useState([])
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-    const getNotes = async() => {
-        try {
-            const response = api.get('/notes')
-
-            setNotes(response)
+        const getNotes = async() => {
+            try {
+                const response = await api.get('/notes')
+                setNotes(response)
             } catch (err) {
                 console.log(err)
+            } finally {
+                setLoading(false);
             }
         }
 
@@ -27,6 +29,10 @@ export default function Dashboard() {
 
         try {
             await api.createNote(user, title, content)
+            const response = await api.get('/notes');
+            setNotes(response);
+            setTitle('');
+            setContent('');
         } catch (err) {
             console.log(err)
         }
@@ -60,9 +66,14 @@ export default function Dashboard() {
             </div>
             <div className="notes-container">
                 <h2>Notes:</h2>
-                <li>
-
-                </li>
+                    <ul>
+                        {notes.map(note => (
+                            <li key={note.id}>
+                                <h3>{note.title}</h3>
+                                <p>{note.content}</p>
+                            </li>
+                        ))}
+                    </ul>
             </div>
          </div>
         </>
