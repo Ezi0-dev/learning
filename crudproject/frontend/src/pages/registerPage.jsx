@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { useNavigate, Navigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import api from '../js/api.js'
 
 export default function RegisterPage() {
     const [username, setUsername] = useState('')
@@ -7,24 +8,16 @@ export default function RegisterPage() {
     const [password, setPassword] = useState('')
     const navigate = useNavigate();
 
-    function registerUser(e) {
+    async function registerUser(e) {
       e.preventDefault();
 
-      const userInfo = {
-        username: username,
-        email: email,
-        password: password
+      try {
+        const response = await api.post('/register', { username, email, password })
+
+        navigate('/login')
+      } catch (err) {
+        console.log(err)
       }
-
-      console.log(userInfo)
-
-      fetch("http://localhost:3000/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "Application/JSON",
-        },
-        body: JSON.stringify(userInfo),
-      })
 
       setUsername("");
       setEmail("");
@@ -35,7 +28,7 @@ export default function RegisterPage() {
       <>
       <div className="component-container">
         <div className="register-container">
-            
+
             <h1>Register</h1>
 
             <form id="registerForm" onSubmit={registerUser}>
@@ -68,4 +61,4 @@ export default function RegisterPage() {
       </div>
       </>
     )
-}
+} 

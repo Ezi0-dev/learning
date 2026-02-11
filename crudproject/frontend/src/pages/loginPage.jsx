@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, Navigate, Link, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../js/authContext';
 import api from '../js/api';
 
@@ -10,6 +10,7 @@ export default function LoginPage() {
     const [password, setPassword] = useState('')
     const [error, setError] = useState(location.state?.error || '')
     const { setAccessToken, setUser } = useAuth()
+    const navigate = useNavigate()
 
     async function loginUser(e) {
       e.preventDefault();
@@ -22,7 +23,7 @@ export default function LoginPage() {
         api.setToken(response.accessToken)
         setUser(response.user.username)
 
-        Navigate('/dashboard')
+        navigate('/dashboard')
 
       } catch (err) {
         setError(err.respone?.data?.message || 'Login failed')

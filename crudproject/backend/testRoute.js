@@ -50,13 +50,9 @@ async function routes (fastify, options) {
         try {
             const password_hash = await argon2.hash(password)
 
-            fastify.pg.query(
-                'insert into users (username, email, password, ip_address) VALUES ($1, $2, $3, $4);', [username, email, password_hash, ip],
-                function onResult (err, result) {
-                    reply.send(err || result)
-                }
-            )
+            await fastify.pg.query('INSERT INTO users (username, email, password, ip_address) VALUES ($1, $2, $3, $4);', [username, email, password_hash, ip])
 
+            reply.send({ message: "User registered successfully!" })
         } catch (err) {
             console.log(err);
         }
