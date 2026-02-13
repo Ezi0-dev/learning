@@ -28,7 +28,7 @@ export default function Dashboard() {
         e.preventDefault()
 
         try {
-            await api.createNote(user, title, content)
+            await api.post('/notes', { user, title, content })
             const response = await api.get('/notes');
             setNotes(response);
             setTitle('');
