@@ -123,3 +123,14 @@
   flex-direction: column;
   gap: 10px;
 }
+
+.notes-container li {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  align-items: center;
+  background-color: #2e2e2ea1;
+  border-radius: 10px;
+  border: #ffffff7e 2px solid;
+  padding: 20px 10px;
+}

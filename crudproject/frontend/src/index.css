@@ -22,9 +22,17 @@ body {
   min-height: 100vh;
 }
 
-h1, h2 {
+h1, h2, h3, p {
   margin: 0;
   padding: 0;
+}
+
+ul {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  gap: 10px;
 }
 
 .wrapper {
