@@ -44,7 +44,19 @@ class API {
             body: JSON.stringify(body)
         })
 
-        console.log("this is body : ", body)
+        if (!response.ok) throw new Error(`HTTP ${response.status}`)
+        return response.json()
+    }
+
+    async delete(endpoint) {
+        const response = await fetch(`${this.baseURL}${endpoint}`, {
+            method: 'DELETE',
+            credentials: 'include',
+            headers: { 
+                'Authorization': `Bearer ${this.token}`
+            },
+        })
+
         if (!response.ok) throw new Error(`HTTP ${response.status}`)
         return response.json()
     }

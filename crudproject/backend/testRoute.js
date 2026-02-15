@@ -16,7 +16,7 @@ async function routes (fastify, options) {
 
     fastify.get('/notes', { onRequest: [fastify.authenticate] }, async (req, reply) => {
         try {
-            const result = await fastify.pg.query('SELECT "user", title, content FROM notes WHERE "user" = $1;', [req.user.username])
+            const result = await fastify.pg.query('SELECT id, "user", title, content FROM notes WHERE "user" = $1;', [req.user.username])
 
             reply.send(result.rows)
         } catch (err) {
@@ -128,6 +128,19 @@ async function routes (fastify, options) {
             reply.send({ message: "Note created successfully!" })
         } catch(err) {
             reply.send(err)
+            console.log(err)
+        }
+    })
+
+    fastify.delete('/notes/:id', async (req, reply) => {
+        const id = req.params.id
+
+        console.log("id", id)
+
+        try {
+            await fastify.pg.query('DELETE FROM notes WHERE id = $1;', [id]);
+            reply.send({ message: 'Note Removed!' })
+        } catch (err) {
             console.log(err)
         }
     })

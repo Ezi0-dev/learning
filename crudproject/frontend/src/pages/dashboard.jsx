@@ -23,6 +23,17 @@ export default function Dashboard() {
 
         getNotes()
     }, [])
+
+    async function deleteNote(id) {
+        console.log(id)
+        try {
+            await api.delete(`/notes/${id}`)
+            setNotes(prevNotes => prevNotes.filter(note => note.id !== id))
+            console.log('Note deleted:', id) // debug
+        } catch (err) {
+            console.log(err)
+        }
+    }
  
     async function createNote(e) {
         e.preventDefault()
@@ -71,6 +82,7 @@ export default function Dashboard() {
                             <li key={note.id}>
                                 <h3>{note.title}</h3>
                                 <p>{note.content}</p>
+                                <button onClick={() => deleteNote(note.id)}>Delete</button>
                             </li>
                         ))}
                     </ul>
