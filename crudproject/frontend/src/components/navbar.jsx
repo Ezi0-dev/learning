@@ -8,7 +8,7 @@ export default function Navbar() {
 
     async function handleLogout() {
         try {
-            await api.get('/logout')
+            await api.post('/logout')
 
             window.location.href = '/login';
         } catch (err) {

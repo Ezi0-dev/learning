@@ -14,9 +14,14 @@ async function routes (fastify, options) {
         return brands
     })
 
-    fastify.get('/logout', async (req, reply) => {
+    fastify.post('/logout', async (req, reply) => {
         try {
-            reply.clearCookie('refreshToken')
+            reply.clearCookie('refreshToken', {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'strict'
+            });
+
             reply.send({ message: 'Logout successful!' })
         } catch (err) {
             reply.status(500).send({ error: 'Logout failed' })
@@ -33,7 +38,7 @@ async function routes (fastify, options) {
         }
     })
 
-    fastify.get('/allnotes', (reply) => {
+    fastify.get('/allnotes', (req, reply) => {
         try {
             const result = fastify.pg.query('SELECT * FROM notes;')
                         
@@ -67,7 +72,7 @@ async function routes (fastify, options) {
         }
     })
 
-    fastify.get('/refresh', { onRequest: [fastify.authenticateRefresh] }, async (req, reply) => {
+    fastify.post('/refresh', { onRequest: [fastify.authenticateRefresh] }, async (req, reply) => {
         const refreshToken = req.cookies.refreshToken
 
         console.log(req.cookies)

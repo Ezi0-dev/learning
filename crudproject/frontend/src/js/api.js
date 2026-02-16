@@ -25,7 +25,7 @@ class API {
     // Ugly fix imo, can def improve
     async refresh() {
         const response = await fetch(`${this.baseURL}/refresh`, {
-            method: 'GET',
+            method: 'POST',
             credentials: 'include'
         })
 
@@ -34,15 +34,20 @@ class API {
     }
 
     async post(endpoint, body) {
-        const response = await fetch(`${this.baseURL}${endpoint}`, {
+        const options = {
             method: 'POST',
             credentials: 'include',
             headers: { 
-                'Content-Type': 'application/json',
                 'Authorization': `Bearer ${this.token}`
-            },
-            body: JSON.stringify(body)
-        })
+            }
+        };
+
+        if (body) {
+            options.headers['Content-Type'] = 'application/json';
+            options.body = JSON.stringify(body);
+        }
+
+        const response = await fetch(`${this.baseURL}${endpoint}`, options);
 
         if (!response.ok) throw new Error(`HTTP ${response.status}`)
         return response.json()
