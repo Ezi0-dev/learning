@@ -14,6 +14,15 @@ async function routes (fastify, options) {
         return brands
     })
 
+    fastify.get('/logout', async (req, reply) => {
+        try {
+            reply.clearCookie('refreshToken')
+            reply.send({ message: 'Logout successful!' })
+        } catch (err) {
+            reply.status(500).send({ error: 'Logout failed' })
+        }
+    })
+
     fastify.get('/notes', { onRequest: [fastify.authenticate] }, async (req, reply) => {
         try {
             const result = await fastify.pg.query('SELECT id, "user", title, content FROM notes WHERE "user" = $1;', [req.user.username])
