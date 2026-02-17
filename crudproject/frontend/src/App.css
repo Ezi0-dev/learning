@@ -133,3 +133,10 @@
   border-radius: 10px;
   padding: 20px 10px;
 }
+
+.homePage {
+  display: flex;
+  flex-direction: column;
+  max-width: 40vh;
+  margin: 0 auto;
+}
