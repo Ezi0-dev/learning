@@ -133,6 +133,19 @@ async function routes (fastify, options) {
         
     }) 
 
+    fastify.put('/notes', async (req, reply) => {
+        const { id, title, content } = req.body
+
+        try {
+            await fastify.pg.query('UPDATE notes SET title = $1, content = $2 WHERE id = $3;', [title, content, id])
+            
+            reply.send({ message: "Note updated successfully!" })
+        } catch(err) {
+            reply.send(err)
+            console.log(err)
+        }
+    })
+
     fastify.post('/notes', async (req, reply) => {
         const { user, title, content } = req.body
 

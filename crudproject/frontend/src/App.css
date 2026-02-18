@@ -140,3 +140,31 @@
   max-width: 40vh;
   margin: 0 auto;
 }
+
+.modal-overlay {
+  position: fixed;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  left: 0; 
+  right: 0; 
+  top: 0;
+  bottom: 0;
+  backdrop-filter: blur(4px);
+}
+
+.modal-content {
+  margin: 20vh auto auto auto;
+  background-color:#3c3c3c;
+  padding: 20px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 50vh;
+  font-size: 2rem;
+}
+
+.modal-content button, input, textarea {
+  font-size: 1.5rem;
+}

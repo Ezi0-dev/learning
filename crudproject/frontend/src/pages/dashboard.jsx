@@ -8,6 +8,8 @@ export default function Dashboard() {
     const [content, setContent] = useState('')
     const [notes, setNotes] = useState([])
     const [loading, setLoading] = useState(true);
+    const [isOpen, setIsOpen] = useState(false)
+    const [editingNote, setEditingNote] = useState(null)
 
     useEffect(() => {
         const getNotes = async() => {
@@ -33,6 +35,28 @@ export default function Dashboard() {
         } catch (err) {
             console.log(err)
         }
+    }
+
+    const editNote = (id) => {
+        const note = notes.find(n => n.id === id);
+        setEditingNote(note);
+        setIsOpen(true);
+    }
+
+    const saveNote = async () => {
+        const { id, title, content } = editingNote
+
+        console.log(editingNote)
+
+        api.put('/notes', { title, content, id })
+
+
+        setNotes(notes.map(n => 
+            n.id === editingNote.id ? editingNote : n
+        ));
+
+        setIsOpen(false);
+        setEditingNote(null);
     }
  
     async function createNote(e) {
@@ -83,10 +107,33 @@ export default function Dashboard() {
                                 <h3>{note.title}</h3>
                                 <p>{note.content}</p>
                                 <button onClick={() => deleteNote(note.id)}>Delete</button>
+                                <button onClick={() => editNote(note.id)}>Edit</button>
                             </li>
                         ))}
                     </ul>
             </div>
+
+            {isOpen && (
+                <div className="modal-overlay" onClick={() => setIsOpen(false)}>
+                    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                        <h2>Edit Note</h2>
+                        <input
+                            type="text"
+                            value={editingNote.title}
+                            onChange={(e) => setEditingNote({...editingNote, title: e.target.value})}
+                            placeholder="Title"
+                        />
+                        <textarea
+                            value={editingNote.content}
+                            onChange={(e) => setEditingNote({...editingNote, content: e.target.value})}
+                            rows={10}
+                            placeholder="Content"
+                        />
+                        <button onClick={saveNote}>Save</button>
+                        <button onClick={() => setIsOpen(false)}>Cancel</button>
+                    </div>
+                </div>
+            )}
          </div>
         </>
     )

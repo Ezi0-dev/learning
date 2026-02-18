@@ -53,6 +53,26 @@ class API {
         return response.json()
     }
 
+    async put(endpoint, body) {
+        const options = {
+            method: 'PUT',
+            credentials: 'include',
+            headers: { 
+                'Authorization': `Bearer ${this.token}`
+            }
+        };
+
+        if (body) {
+            options.headers['Content-Type'] = 'application/json';
+            options.body = JSON.stringify(body);
+        }
+
+        const response = await fetch(`${this.baseURL}${endpoint}`, options);
+
+        if (!response.ok) throw new Error(`HTTP ${response.status}`)
+        return response.json()
+    }
+
     async delete(endpoint) {
         const response = await fetch(`${this.baseURL}${endpoint}`, {
             method: 'DELETE',
