@@ -133,7 +133,7 @@ async function routes (fastify, options) {
         
     }) 
 
-    fastify.put('/notes', async (req, reply) => {
+    fastify.put('/notes', { onRequest: [fastify.authenticate] }, async (req, reply) => {
         const { id, title, content } = req.body
 
         try {
@@ -146,7 +146,7 @@ async function routes (fastify, options) {
         }
     })
 
-    fastify.post('/notes', async (req, reply) => {
+    fastify.post('/notes', { onRequest: [fastify.authenticate] }, async (req, reply) => {
         const { user, title, content } = req.body
 
         try {
@@ -159,13 +159,13 @@ async function routes (fastify, options) {
         }
     })
 
-    fastify.delete('/notes/:id', async (req, reply) => {
+    fastify.delete('/notes/:id', { onRequest: [fastify.authenticate] }, async (req, reply) => {
         const id = req.params.id
 
         console.log("id", id)
 
         try {
-            await fastify.pg.query('DELETE FROM notes WHERE id = $1;', [id]);
+            await fastify.pg.query('UPDATE notes SET deleted_at = NOW() WHERE id = $1;', [id]);
             reply.send({ message: 'Note Removed!' })
         } catch (err) {
             console.log(err)
