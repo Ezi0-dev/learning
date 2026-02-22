@@ -30,7 +30,7 @@ async function routes (fastify, options) {
 
     fastify.get('/notes', { onRequest: [fastify.authenticate] }, async (req, reply) => {
         try {
-            const result = await fastify.pg.query('SELECT id, "user", title, content FROM notes WHERE "user" = $1;', [req.user.username])
+            const result = await fastify.pg.query('SELECT id, "user", title, content FROM notes WHERE "user" = $1 AND deleted_at IS NULL;', [req.user.username])
 
             reply.send(result.rows)
         } catch (err) {
@@ -150,6 +150,12 @@ async function routes (fastify, options) {
         const { user, title, content } = req.body
 
         try {
+            const { rows } = await fastify.pg.query('SELECT COUNT(*) FROM notes WHERE "user" = $1 AND deleted_at IS NULL', [user])
+
+            console.log(rows)
+            if (parseInt(rows[0].count) >= 5) {
+                return reply.status(403).send({ error: 'Note limit reached' })
+            }
             await fastify.pg.query('INSERT INTO notes ("user", title, content) VALUES ($1, $2, $3);', [user, title, content])
             
             reply.send({ message: "Note created successfully!" })
