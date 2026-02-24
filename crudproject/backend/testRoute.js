@@ -67,6 +67,7 @@ async function routes (fastify, options) {
             await fastify.pg.query('INSERT INTO users (username, email, password, ip_address) VALUES ($1, $2, $3, $4);', [username, email, password_hash, ip])
 
             reply.send({ message: "User registered successfully!" })
+            fastify.log.info(`User registered: ${username} ${email}`)
         } catch (err) {
             console.log(err);
         }

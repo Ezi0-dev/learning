@@ -12,7 +12,11 @@ import dotenv from "dotenv";
 
 const fastify = Fastify({
   trustProxy: true,
-  logger: true,
+  logger: {
+    transport: {
+      target: 'pino-pretty'
+    }
+  }
 });
 
 fastify.register(cors, {
