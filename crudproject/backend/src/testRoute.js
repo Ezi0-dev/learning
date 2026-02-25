@@ -1,5 +1,6 @@
 import 'dotenv/config'
 import argon2 from 'argon2'
+import schemas from './modules/schemas.js'
 
 async function routes (fastify, options) {
     const brands =  [ "Nvidia", "Amd" ]
@@ -57,7 +58,7 @@ async function routes (fastify, options) {
         )
     })
 
-    fastify.post('/register', async (req, reply) => {
+    fastify.post('/register', { schema: schemas.register }, async (req, reply) => {
         const ip = req.ip;
         const { username, email, password } = req.body;
 
@@ -147,14 +148,15 @@ async function routes (fastify, options) {
         }
     })
 
-    fastify.post('/notes', { onRequest: [fastify.authenticate] }, async (req, reply) => {
-        const { user, title, content } = req.body
+    fastify.post('/notes', { onRequest: [fastify.authenticate], schema: schemas.createNote }, async (req, reply) => {
+        const { title, content } = req.body
+        const user = req.user.username
 
         try {
             const { rows } = await fastify.pg.query('SELECT COUNT(*) FROM notes WHERE "user" = $1 AND deleted_at IS NULL', [user])
 
             console.log(rows)
-            if (parseInt(rows[0].count) >= 5) {
+            if (parseInt(rows[0].count) >= 10) {
                 return reply.status(403).send({ error: 'Note limit reached' })
             }
             await fastify.pg.query('INSERT INTO notes ("user", title, content) VALUES ($1, $2, $3);', [user, title, content])
@@ -179,7 +181,7 @@ async function routes (fastify, options) {
         }
     })
 
-    fastify.post('/login', async (req, reply) => {
+    fastify.post('/login', { schema: schemas.login }, async (req, reply) => {
         const { username, password } = req.body;
 
         try {
