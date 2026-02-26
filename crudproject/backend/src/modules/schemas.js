@@ -24,10 +24,9 @@ const registerSchema = {
     response: {
         201: {
             type: 'object',
+            required: ['message'],
             properties: {
-                id: {type: 'number'},
-                username: {type: 'string'},
-                email: {type: 'string'}
+                message: {type: 'string'}
             }
         }
     }
