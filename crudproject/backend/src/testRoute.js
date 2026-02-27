@@ -135,7 +135,7 @@ async function routes (fastify, options) {
         
     }) 
 
-    fastify.put('/notes', { onRequest: [fastify.authenticate] }, async (req, reply) => {
+    fastify.put('/notes', { onRequest: [fastify.authenticate], scheam: schemas.noteSchema }, async (req, reply) => {
         const { id, title, content } = req.body
 
         try {
@@ -148,7 +148,7 @@ async function routes (fastify, options) {
         }
     })
 
-    fastify.post('/notes', { onRequest: [fastify.authenticate], schema: schemas.createNote }, async (req, reply) => {
+    fastify.post('/notes', { onRequest: [fastify.authenticate], schema: schemas.noteSchema }, async (req, reply) => {
         const { title, content } = req.body
         const user = req.user.username
 
@@ -168,8 +168,10 @@ async function routes (fastify, options) {
         }
     })
 
-    fastify.delete('/notes/:id', { onRequest: [fastify.authenticate] }, async (req, reply) => {
+    fastify.delete('/notes/:id', { onRequest: [fastify.authenticate], schema: schemas.deleteNoteSchema }, async (req, reply) => {
         const id = req.params.id
+
+        console.log(req.body)
 
         console.log("id", id)
 

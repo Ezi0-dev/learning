@@ -101,10 +101,34 @@ const noteSchema = {
     }
 }
 
+const deleteNoteSchema = {
+    params: {
+        type: 'object',
+        required: ['id'],
+        properties: {
+            id: {
+                type: 'string', 
+                pattern: '^[0-9]+$'
+            }
+        },
+        additionalProperties: false
+    },
+    response: {
+        200: {
+            type: 'object',
+            required: ['message'],
+            properties: {
+                message: {type: 'string'}
+            }
+        }
+    }
+}
+
 const schemas = {
     register: registerSchema,
     login: loginSchema,
-    createNote: noteSchema,
+    noteSchema: noteSchema,
+    deleteNoteSchema: deleteNoteSchema,
 };
 
 export default schemas;
