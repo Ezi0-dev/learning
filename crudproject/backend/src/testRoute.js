@@ -3,16 +3,11 @@ import argon2 from 'argon2'
 import schemas from './modules/schemas.js'
 
 async function routes (fastify, options) {
-    const brands =  [ "Nvidia", "Amd" ]
-
+    
     fastify.get('/', async (req, reply) => {
         console.log()
         fastify.authenticate(req)
         return { hello: 'world' }
-    })
-
-    fastify.get('/brands', async (req, reply) => {
-        return brands
     })
 
     fastify.post('/logout', async (req, reply) => {
@@ -111,29 +106,6 @@ async function routes (fastify, options) {
             return reply.code(401).send({ error: 'Invalid refresh token' })
         }
     })
-
-    fastify.get('/me', async (req, reply) => {
-        const authHeader = req.headers.authorization
-
-        const token = authHeader.replace('Bearer', '')
-
-        console.log("/me route token is : ", token)
-
-        try {
-            const decoded = jwt.verify(token, process.env.JWT_SECRET)
-
-            reply.send({
-                user: {
-                    id: user.id,
-                    email: user.email,
-                    username: user.username
-                }
-            })
-        } catch (err) {
-            return reply.code(401).reply.send({ error: 'Invalid token' })
-        }
-        
-    }) 
 
     fastify.put('/notes', { onRequest: [fastify.authenticate], scheam: schemas.noteSchema }, async (req, reply) => {
         const { id, title, content } = req.body

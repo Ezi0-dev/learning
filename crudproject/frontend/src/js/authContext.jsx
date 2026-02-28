@@ -20,7 +20,6 @@ export const AuthProvider = ({ children }) => {
 
                 setAccessToken(token)
                 setUser(response.user.username)
-                console.log("Token successfully set:", accessToken);
             } catch {
                 setAccessToken(null)
             } finally {
