@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import api from "../js/api";
 
 export default function Dashboard() {
-    const { user } = useAuth()
+    const { user, accessToken } = useAuth()
     const [title, setTitle] = useState('')
     const [content, setContent] = useState('')
     const [notes, setNotes] = useState([])
@@ -12,6 +12,8 @@ export default function Dashboard() {
     const [editingNote, setEditingNote] = useState(null)
 
     useEffect(() => {
+        if (!accessToken) return
+
         const getNotes = async() => {
             try {
                 const response = await api.get('/notes')
