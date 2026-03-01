@@ -3,7 +3,7 @@ import argon2 from 'argon2'
 import schemas from './modules/schemas.js'
 
 async function routes (fastify, options) {
-    
+
     fastify.get('/', async (req, reply) => {
         console.log()
         fastify.authenticate(req)
@@ -42,15 +42,6 @@ async function routes (fastify, options) {
         } catch (err) {
             reply.status(500).send({ error: err.message })
         }
-    })
-
-    fastify.get('/users', (req, reply) => {
-        fastify.pg.query(
-            'SELECT * FROM users;',
-            function onResult (err, result) {
-                reply.send(err || result.rows)
-            }
-        )
     })
 
     fastify.post('/register', { schema: schemas.register }, async (req, reply) => {
