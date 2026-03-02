@@ -32,6 +32,8 @@ fastify.register(jwt, {
   cookie: {
     cookieName: "refreshToken",
     signed: false,
+    sameSite: 'strict', // CSRF
+    path: '/'
   },
 });
 

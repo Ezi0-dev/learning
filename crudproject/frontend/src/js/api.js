@@ -58,9 +58,6 @@ class API {
     }
 
     async handleUnauthorized(method, endpoint, body) {
-        console.log('401 on endpoint:', endpoint)  // ← what endpoint is hitting 401?
-        console.log('current token:', this.token)   // ← is token null or expired?
-
         if (endpoint === '/refresh') {
             window.location.href = '/login'
             return
@@ -76,8 +73,6 @@ class API {
         try {
             await this.tryRefreshToken()
             this.flushQueue()
-            console.log('token refreshed, retrying:', endpoint) // ← does this log?
-            console.log('current token:', this.token)   // ← is token null or expired?
             return this.request(method, endpoint, body)
         } catch (err) {
             this.flushQueue(err)

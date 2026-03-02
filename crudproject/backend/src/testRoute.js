@@ -15,7 +15,8 @@ async function routes (fastify, options) {
             reply.clearCookie('refreshToken', {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
-                sameSite: 'strict'
+                sameSite: 'strict',
+                path: '/'
             });
 
             reply.send({ message: 'Logout successful!' })
@@ -62,8 +63,6 @@ async function routes (fastify, options) {
 
     fastify.post('/refresh', { onRequest: [fastify.authenticateRefresh] }, async (req, reply) => {
         const refreshToken = req.cookies.refreshToken
-
-        console.log(req.cookies)
 
         if (!refreshToken) {
             return reply.code(401).send({ error: 'No refresh token provided' })
@@ -167,6 +166,10 @@ async function routes (fastify, options) {
                 const refreshToken = fastify.jwt.sign(
                     { id: user.id, },
                     { expiresIn: process.env.REFRESH_TOKEN_EXP}
+                );
+
+                await fastify.pg.query(
+                    `INSERT INTO sessions (user_id, refresh_token, expires_at) VALUES ($1, $2, NOW() + INTERVAL '7 days')`, [user.id, refreshToken]
                 );
                 
                 reply
