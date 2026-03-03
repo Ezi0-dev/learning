@@ -10,7 +10,7 @@ async function routes (fastify, options) {
         return { hello: 'world' }
     })
 
-    fastify.post('/logout', async (req, reply) => {
+    fastify.post('/logout', { onRequest: [fastify.authenticateRefresh] }, async (req, reply) => {
         try {
             reply.clearCookie('refreshToken', {
                 httpOnly: true,
@@ -18,6 +18,10 @@ async function routes (fastify, options) {
                 sameSite: 'strict',
                 path: '/'
             });
+
+            await fastify.pg.query(
+                'DELETE FROM sessions WHERE user_id = $1', [req.user.id]
+            );
 
             reply.send({ message: 'Logout successful!' })
         } catch (err) {
