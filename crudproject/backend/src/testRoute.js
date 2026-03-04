@@ -39,16 +39,6 @@ async function routes (fastify, options) {
         }
     })
 
-    fastify.get('/allnotes', (req, reply) => {
-        try {
-            const result = fastify.pg.query('SELECT * FROM notes;')
-                        
-            reply.send(result.rows)
-        } catch (err) {
-            reply.status(500).send({ error: err.message })
-        }
-    })
-
     fastify.post('/register', { schema: schemas.register }, async (req, reply) => {
         const ip = req.ip;
         const { username, email, password } = req.body;
