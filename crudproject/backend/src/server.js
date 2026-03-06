@@ -9,6 +9,7 @@ import cors from "@fastify/cors";
 import jwt from "@fastify/jwt";
 import cookie from "@fastify/cookie";
 import dotenv from "dotenv";
+import sensible from "@fastify/sensible"
 
 const fastify = Fastify({
   trustProxy: true,
@@ -26,6 +27,7 @@ fastify.register(cors, {
   allowedHeaders: ["Content-Type", "Authorization"],
 });
 
+fastify.register(sensible)
 fastify.register(cookie);
 fastify.register(jwt, {
   secret: process.env.JWT_SECRET,
@@ -70,6 +72,20 @@ fastify.decorate("authenticate", async function (req, reply) {
 
 fastify.register(dbConnector);
 fastify.register(testRoute);
+
+fastify.setErrorHandler((err, req, reply)=> {
+  if (err.validation) {
+    return reply.status(400).send({ error: err.message })
+  }
+
+  if (err.statusCode) {
+    return reply.status(err.statusCode).send({ error: err.message })
+  }
+
+  // Dont expose internal errors to the client
+  fastify.log.error(err)
+  reply.status(500).send({ error: 'Internal server error' })
+})
 
 // Run the server!
 fastify.listen({ port: 3000 }, function (err, address) {
