@@ -11,48 +11,37 @@ async function routes (fastify, options) {
     })
 
     fastify.post('/logout', { onRequest: [fastify.authenticateRefresh] }, async (req, reply) => {
-        try {
-            reply.clearCookie('refreshToken', {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'strict',
-                path: '/'
-            });
+        reply.clearCookie('refreshToken', {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            path: '/'
+        });
 
-            await fastify.pg.query(
-                'DELETE FROM sessions WHERE user_id = $1', [req.user.id]
-            );
+        await fastify.pg.query(
+            'DELETE FROM sessions WHERE user_id = $1', [req.user.id]
+        );
 
-            reply.send({ message: 'Logout successful!' })
-        } catch (err) {
-            reply.status(500).send({ error: 'Logout failed' })
-        }
+        reply.status(201).send({ message: 'Logout successful!' })
     })
 
     fastify.get('/notes', { onRequest: [fastify.authenticate] }, async (req, reply) => {
-        try {
-            const result = await fastify.pg.query('SELECT id, "user", title, content FROM notes WHERE "user" = $1 AND deleted_at IS NULL;', [req.user.username])
+        const result = await fastify.pg.query('SELECT id, "user", title, content FROM notes WHERE "user" = $1 AND deleted_at IS NULL;', 
+            [req.user.username])
 
-            reply.send(result.rows)
-        } catch (err) {
-            reply.status(500).send({ error: err.message })
-        }
+        reply.status(201).send(result.rows)
     })
 
     fastify.post('/register', { schema: schemas.register }, async (req, reply) => {
         const ip = req.ip;
         const { username, email, password } = req.body;
 
-        try {
-            const password_hash = await argon2.hash(password)
+        const password_hash = await argon2.hash(password)
 
-            await fastify.pg.query('INSERT INTO users (username, email, password, ip_address) VALUES ($1, $2, $3, $4);', [username, email, password_hash, ip])
+        await fastify.pg.query('INSERT INTO users (username, email, password, ip_address) VALUES ($1, $2, $3, $4);', [username, email, password_hash, ip])
 
-            reply.send({ message: "User registered successfully!" })
-            fastify.log.info(`User registered: ${username} ${email}`)
-        } catch (err) {
-            console.log(err);
-        }
+        reply.status(201).send({ message: "User registered successfully!" })
+        fastify.log.info(`User registered: ${username} ${email}`)
     })
 
     fastify.post('/refresh', { onRequest: [fastify.authenticateRefresh] }, async (req, reply) => {
@@ -62,46 +51,36 @@ async function routes (fastify, options) {
             return reply.code(401).send({ error: 'No refresh token provided' })
         }
 
-        try {
-            // Authenticates the refreshToken
+        // Authenticates the refreshToken
 
-            const result = await fastify.pg.query('SELECT id, username, email FROM users WHERE id = $1;', [req.user.id])
+        const result = await fastify.pg.query('SELECT id, username, email FROM users WHERE id = $1;', [req.user.id])
 
-            const user = result.rows[0]
-                
-            console.log("! /REFRESH ROUTE IN USE !")
+        const user = result.rows[0]
+            
+        console.log("! 👻 REFRESH ROUTE IN USE 👻 !")
 
-            // New token gets generated
-            const accessToken = fastify.jwt.sign(
-                { id: user.id, username: user.username, email: user.email },
-                { expiresIn: process.env.ACCESS_TOKEN_EXP}
-            );
+        // New token gets generated
+        const accessToken = fastify.jwt.sign(
+            { id: user.id, username: user.username, email: user.email },
+            { expiresIn: process.env.ACCESS_TOKEN_EXP}
+        );
 
-            return reply.send({
-                accessToken,
-                user: {
-                    id: user.id,
-                    username: user.username,
-                    email: user.email
-                }
-            });
-        } catch (err) {
-            console.log(err)
-            return reply.code(401).send({ error: 'Invalid refresh token' })
-        }
+        return reply.status(201).send({
+            accessToken,
+            user: {
+                id: user.id,
+                username: user.username,
+                email: user.email
+            }
+        });
     })
 
     fastify.put('/notes', { onRequest: [fastify.authenticate], scheam: schemas.noteSchema }, async (req, reply) => {
         const { id, title, content } = req.body
 
-        try {
-            await fastify.pg.query('UPDATE notes SET title = $1, content = $2 WHERE id = $3;', [title, content, id])
+        await fastify.pg.query('UPDATE notes SET title = $1, content = $2 WHERE id = $3;', [title, content, id])
             
-            reply.send({ message: "Note updated successfully!" })
-        } catch(err) {
-            reply.send(err)
-            console.log(err)
-        }
+        reply.status(201).send({ message: "Note updated successfully!" })
     })
 
     fastify.post('/notes', { onRequest: [fastify.authenticate], schema: schemas.noteSchema }, async (req, reply) => {
@@ -130,65 +109,53 @@ async function routes (fastify, options) {
 
         console.log("id", id)
 
-        try {
-            await fastify.pg.query('UPDATE notes SET deleted_at = NOW() WHERE id = $1;', [id]);
-            reply.send({ message: 'Note Removed!' })
-        } catch (err) {
-            console.log(err)
-        }
+        await fastify.pg.query('UPDATE notes SET deleted_at = NOW() WHERE id = $1;', [id]);
+
+        reply.status(201).send({ message: 'Note deleted successfully' })
     })
 
     fastify.post('/login', { schema: schemas.login }, async (req, reply) => {
         const { username, password } = req.body;
 
-        try {
-            const { rows } = await fastify.pg.query(
-                'SELECT id, username, email, password, ip_address FROM users WHERE username = $1;', [username]
+        const { rows } = await fastify.pg.query(
+            'SELECT id, username, email, password, ip_address FROM users WHERE username = $1;', [username]
+        );
+
+        const user = rows[0];
+
+        if (await argon2.verify(user.password, password)) {
+            console.log("Success password match !!! 🐼🐼👻👻");
+
+            const accessToken = fastify.jwt.sign(
+                { id: user.id, username: user.username, email: user.email },
+                { expiresIn: process.env.ACCESS_TOKEN_EXP}
             );
 
-            const user = rows[0];
+            const refreshToken = fastify.jwt.sign(
+                { id: user.id, },
+                { expiresIn: process.env.REFRESH_TOKEN_EXP}
+            );
 
-            if (await argon2.verify(user.password, password)) {
-                console.log("Success password match !!! 🐼🐼👻👻");
-
-                const accessToken = fastify.jwt.sign(
-                    { id: user.id, username: user.username, email: user.email },
-                    { expiresIn: process.env.ACCESS_TOKEN_EXP}
-                );
-
-                const refreshToken = fastify.jwt.sign(
-                    { id: user.id, },
-                    { expiresIn: process.env.REFRESH_TOKEN_EXP}
-                );
-
-                await fastify.pg.query(
-                    `INSERT INTO sessions (user_id, refresh_token, expires_at) VALUES ($1, $2, NOW() + INTERVAL '7 days')`, [user.id, refreshToken]
-                );
-                
-                reply
-                    .setCookie('refreshToken', refreshToken, {
-                        httpOnly: true,
-                        secure: process.env.NODE_ENV === 'production',
-                        sameSite: 'strict',
-                        maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
-                    })
-                    .send({
-                        message: 'Logged in successfully',
-                        user: { id: user.id, username: user.username, email: user.email },
-                        accessToken
-                    });
-            } else {
-                reply.status(401).send({ error: "Invalid username or password" });
-            }
-
+            await fastify.pg.query(
+                `INSERT INTO sessions (user_id, refresh_token, expires_at) VALUES ($1, $2, NOW() + INTERVAL '7 days')`, [user.id, refreshToken]
+            );
             
-            //console.log(rows[0]);
-
-        } catch (err)  {
-            reply.status(500).send({ error: err.message });
+            reply
+                .setCookie('refreshToken', refreshToken, {
+                    httpOnly: true,
+                    secure: process.env.NODE_ENV === 'production',
+                    sameSite: 'strict',
+                    maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+                })
+                .status(201).send({
+                    message: 'Logged in successfully',
+                    user: { id: user.id, username: user.username, email: user.email },
+                    accessToken
+                });
+        } else {
+            reply.status(401).send({ error: "Invalid username or password" });
         }
     })
-
 }
 
 export default routes
