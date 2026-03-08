@@ -40,10 +40,10 @@ fastify.register(jwt, {
   },
 });
 
-await fastify.register(rateLimiter), {
-  max: 100,
+await fastify.register(rateLimiter, {
+  max: 5,
   timeWindow: '1 minute'
-}
+})
 
 fastify.decorate("authenticateRefresh", async function (req, reply) {
   try {
