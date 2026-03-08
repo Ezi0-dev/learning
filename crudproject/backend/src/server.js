@@ -46,34 +46,25 @@ await fastify.register(rateLimiter, {
 })
 
 fastify.decorate("authenticateRefresh", async function (req, reply) {
-  try {
-    await req.jwtVerify();
-    console.log("Refresh token verified:", req.user);
-  } catch (err) {
-    return reply.status(401).send({ error: "Invalid refresh token" });
-  }
+  await req.jwtVerify();
+  console.log("Refresh token verified:", req.user);
 });
 
 fastify.decorate("authenticate", async function (req, reply) {
-  try {
-    console.log("🐼🐼🐼 AUTHENTICATE FUNCTION RUNNING 🐼🐼🐼");
+  console.log("🐼🐼🐼 AUTHENTICATE FUNCTION RUNNING 🐼🐼🐼");
 
-    const authHeader = req.headers.authorization;
+  const authHeader = req.headers.authorization;
 
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return res.status(401).json({ error: "No access token provided" });
-    }
-
-    const accessToken = authHeader.split(" ")[1];
-
-    const decoded = fastify.jwt.verify(accessToken);
-    req.user = decoded;
-
-    console.log("Access token verified:", req.user);
-  } catch (err) {
-    console.log("Auth error:", err.message);
-    return reply.status(401).send({ error: "Invalid access token" });
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ error: "No access token provided" });
   }
+
+  const accessToken = authHeader.split(" ")[1];
+
+  const decoded = fastify.jwt.verify(accessToken);
+  req.user = decoded;
+
+  console.log("Access token verified:", req.user);
 });
 
 fastify.register(dbConnector);
