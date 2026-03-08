@@ -50,8 +50,7 @@ export default function Dashboard() {
 
         console.log(editingNote)
 
-        api.put('/notes', { title, content, id })
-
+        api.put(`/notes/${id}`, { title, content })
 
         setNotes(notes.map(n => 
             n.id === editingNote.id ? editingNote : n

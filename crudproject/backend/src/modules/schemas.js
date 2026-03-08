@@ -101,6 +101,25 @@ const noteSchema = {
     }
 }
 
+const updateNoteSchema = {
+  params: {
+    type: 'object',
+    required: ['id'],
+    properties: {
+      id: { type: 'string' }
+    }
+  },
+  body: {
+    type: 'object',
+    required: ['title', 'content'],
+    properties: {
+      title: { type: 'string', minLength: 5, maxLength: 30 },
+      content: { type: 'string', minLength: 8, maxLength: 500 }
+    },
+    additionalProperties: false
+  }
+}
+
 const deleteNoteSchema = {
     params: {
         type: 'object',
@@ -129,6 +148,7 @@ const schemas = {
     login: loginSchema,
     noteSchema: noteSchema,
     deleteNoteSchema: deleteNoteSchema,
+    updateNoteSchema: updateNoteSchema
 };
 
 export default schemas;

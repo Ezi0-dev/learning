@@ -48,7 +48,7 @@ fastify.register(jwt, {
 // Rate limiting
 
 await fastify.register(rateLimiter, {
-  max: 5,
+  max: 100,
   timeWindow: "1 minute",
 });
 

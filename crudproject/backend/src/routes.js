@@ -18,6 +18,8 @@ async function routes (fastify, options) {
             path: '/'
         });
 
+        // Also delete when users refreshToken expires !
+
         await fastify.pg.query(
             'DELETE FROM sessions WHERE user_id = $1', [req.user.id]
         );
@@ -27,7 +29,8 @@ async function routes (fastify, options) {
 
     fastify.get('/notes', { onRequest: [fastify.authenticate] }, async (req, reply) => {
         const result = await fastify.pg.query('SELECT id, "user", title, content FROM notes WHERE "user" = $1 AND deleted_at IS NULL;', 
-            [req.user.username])
+            [req.user.username]
+        )
 
         reply.status(201).send(result.rows)
     })
@@ -75,12 +78,18 @@ async function routes (fastify, options) {
         });
     })
 
-    fastify.put('/notes', { onRequest: [fastify.authenticate], scheam: schemas.noteSchema }, async (req, reply) => {
-        const { id, title, content } = req.body
+    fastify.put('/notes/:id', { onRequest: [fastify.authenticate], schema: schemas.updateNoteSchema }, async (req, reply) => {
+        console.log("this is the params", req.params)
+        const { title, content } = req.body
+        const { id } = req.params
 
-        await fastify.pg.query('UPDATE notes SET title = $1, content = $2 WHERE id = $3;', [title, content, id])
+        const { rows } = await fastify.pg.query('UPDATE notes SET title = $1, content = $2 WHERE id = $3 AND "user" = $4 RETURNING *;', 
+            [title, content, id, req.user.username]
+        )
+
+        if (!rows[0]) throw fastify.httpErrors.notFound('Note not found')
             
-        reply.status(201).send({ message: "Note updated successfully!" })
+        reply.status(200).send(rows[0])
     })
 
     fastify.post('/notes', { onRequest: [fastify.authenticate], schema: schemas.noteSchema }, async (req, reply) => {
@@ -89,7 +98,8 @@ async function routes (fastify, options) {
 
         const { rows } = await fastify.pg.query(
             'SELECT COUNT(*) FROM notes WHERE "user" = $1 AND deleted_at IS NULL', 
-            [user])
+            [user]
+        )
 
         if (parseInt(rows[0].count) >= 10) {
             throw fastify.httpErrors.forbidden('Note limit reached')
@@ -97,7 +107,8 @@ async function routes (fastify, options) {
 
         await fastify.pg.query(
             'INSERT INTO notes ("user", title, content) VALUES ($1, $2, $3);',
-            [user, title, content])
+            [user, title, content]
+        )
         
         reply.status(201).send({ message: 'Note created successfully' })
     })
@@ -109,7 +120,7 @@ async function routes (fastify, options) {
 
         console.log("id", id)
 
-        await fastify.pg.query('UPDATE notes SET deleted_at = NOW() WHERE id = $1;', [id]);
+        await fastify.pg.query('UPDATE notes SET deleted_at = NOW() WHERE id = $1 AND "user" = $2 RETURNING id;', [id, req.user.username]);
 
         reply.status(201).send({ message: 'Note deleted successfully' })
     })
