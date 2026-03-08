@@ -59,7 +59,12 @@ fastify.register(dbConnector);
 // Decorators
 
 fastify.decorate("authenticateRefresh", async function (req, reply) {
-  await req.jwtVerify();
+  try {
+    await req.jwtVerify({ onlyCookie: true })
+  } catch (err) {
+    throw fastify.httpErrors.unauthorized('Invalid or expired token')
+  }
+  
   console.log("Refresh token verified:", req.user);
 });
 
@@ -69,13 +74,15 @@ fastify.decorate("authenticate", async function (req, reply) {
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return reply.status(401).json({ error: "No access token provided" });
+    throw fastify.httpErrors.unauthorized("No access token provided");
   }
 
-  const accessToken = authHeader.split(" ")[1];
-
-  const decoded = fastify.jwt.verify(accessToken);
-  req.user = decoded;
+  try {
+      const accessToken = authHeader.split(" ")[1];
+      req.user = fastify.jwt.verify(accessToken);
+  } catch (err) {
+      throw fastify.httpErrors.unauthorized("Invalid or expired token");
+  }
 
   console.log("Access token verified:", req.user);
 });
@@ -91,8 +98,8 @@ fastify.setErrorHandler((err, req, reply) => {
     return reply.status(400).send({ error: err.message });
   }
 
-  if (err.statusCode) {
-    return reply.status(err.statusCode).send({ error: err.message });
+  if (err.statusCode || err.status) {
+    return reply.status(err.statusCode ?? err.status).send({ error: err.message })
   }
 
   // Dont expose internal errors to the client
