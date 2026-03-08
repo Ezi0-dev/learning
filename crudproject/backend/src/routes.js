@@ -79,7 +79,6 @@ async function routes (fastify, options) {
     })
 
     fastify.put('/notes/:id', { onRequest: [fastify.authenticate], schema: schemas.updateNoteSchema }, async (req, reply) => {
-        console.log("this is the params", req.params)
         const { title, content } = req.body
         const { id } = req.params
 
@@ -116,11 +115,13 @@ async function routes (fastify, options) {
     fastify.delete('/notes/:id', { onRequest: [fastify.authenticate], schema: schemas.deleteNoteSchema }, async (req, reply) => {
         const id = req.params.id
 
-        console.log(req.body)
+        const result = await fastify.pg.query('UPDATE notes SET deleted_at = NOW() WHERE id = $1 AND "user" = $2 RETURNING id;', 
+            [id, req.user.username]
+        );
 
-        console.log("id", id)
-
-        await fastify.pg.query('UPDATE notes SET deleted_at = NOW() WHERE id = $1 AND "user" = $2 RETURNING id;', [id, req.user.username]);
+        if (result.rows.length === 0) {
+            throw fastify.httpErrors.notFound('Note not found');
+        }
 
         reply.status(201).send({ message: 'Note deleted successfully' })
     })

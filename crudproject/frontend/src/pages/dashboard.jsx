@@ -50,11 +50,9 @@ export default function Dashboard() {
 
         console.log(editingNote)
 
-        api.put(`/notes/${id}`, { title, content })
+        const updatedNote = await api.put(`/notes/${id}`, { title, content })
 
-        setNotes(notes.map(n => 
-            n.id === editingNote.id ? editingNote : n
-        ));
+        setNotes(notes.map(n => n.id === id ? updatedNote : n))
 
         setIsOpen(false);
         setEditingNote(null);
