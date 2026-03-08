@@ -10,6 +10,7 @@ import jwt from "@fastify/jwt";
 import cookie from "@fastify/cookie";
 import dotenv from "dotenv";
 import sensible from "@fastify/sensible"
+import rateLimiter from "@fastify/rate-limit"
 
 const fastify = Fastify({
   trustProxy: true,
@@ -38,6 +39,11 @@ fastify.register(jwt, {
     path: '/'
   },
 });
+
+await fastify.register(rateLimiter), {
+  max: 100,
+  timeWindow: '1 minute'
+}
 
 fastify.decorate("authenticateRefresh", async function (req, reply) {
   try {
