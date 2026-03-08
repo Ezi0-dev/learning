@@ -4,21 +4,23 @@
 import Fastify from "fastify";
 import dbConnector from "./db.js";
 import fp from "fastify-plugin";
-import testRoute from "./testRoute.js";
+import routes from "./routes.js";
 import cors from "@fastify/cors";
 import jwt from "@fastify/jwt";
 import cookie from "@fastify/cookie";
 import dotenv from "dotenv";
-import sensible from "@fastify/sensible"
-import rateLimiter from "@fastify/rate-limit"
+import sensible from "@fastify/sensible";
+import rateLimiter from "@fastify/rate-limit";
+
+// Core
 
 const fastify = Fastify({
   trustProxy: true,
   logger: {
     transport: {
-      target: 'pino-pretty'
-    }
-  }
+      target: "pino-pretty",
+    },
+  },
 });
 
 fastify.register(cors, {
@@ -28,22 +30,33 @@ fastify.register(cors, {
   allowedHeaders: ["Content-Type", "Authorization"],
 });
 
-fastify.register(sensible)
+fastify.register(sensible);
 fastify.register(cookie);
+
+// JWT
+
 fastify.register(jwt, {
   secret: process.env.JWT_SECRET,
   cookie: {
     cookieName: "refreshToken",
     signed: false,
-    sameSite: 'strict', // CSRF
-    path: '/'
+    sameSite: "strict", // CSRF
+    path: "/",
   },
 });
 
+// Rate limiting
+
 await fastify.register(rateLimiter, {
   max: 5,
-  timeWindow: '1 minute'
-})
+  timeWindow: "1 minute",
+});
+
+// DB 
+
+fastify.register(dbConnector);
+
+// Decorators
 
 fastify.decorate("authenticateRefresh", async function (req, reply) {
   await req.jwtVerify();
@@ -56,7 +69,7 @@ fastify.decorate("authenticate", async function (req, reply) {
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res.status(401).json({ error: "No access token provided" });
+    return reply.status(401).json({ error: "No access token provided" });
   }
 
   const accessToken = authHeader.split(" ")[1];
@@ -67,22 +80,25 @@ fastify.decorate("authenticate", async function (req, reply) {
   console.log("Access token verified:", req.user);
 });
 
-fastify.register(dbConnector);
-fastify.register(testRoute);
+// Routes
 
-fastify.setErrorHandler((err, req, reply)=> {
+fastify.register(routes);
+
+// Error handling
+
+fastify.setErrorHandler((err, req, reply) => {
   if (err.validation) {
-    return reply.status(400).send({ error: err.message })
+    return reply.status(400).send({ error: err.message });
   }
 
   if (err.statusCode) {
-    return reply.status(err.statusCode).send({ error: err.message })
+    return reply.status(err.statusCode).send({ error: err.message });
   }
 
   // Dont expose internal errors to the client
-  fastify.log.error(err)
-  reply.status(500).send({ error: 'Internal server error' })
-})
+  fastify.log.error(err);
+  reply.status(500).send({ error: "Internal server error" });
+});
 
 // Run the server!
 fastify.listen({ port: 3000 }, function (err, address) {
