@@ -104,12 +104,12 @@ async function routes (fastify, options) {
             throw fastify.httpErrors.forbidden('Note limit reached')
         }
 
-        await fastify.pg.query(
-            'INSERT INTO notes ("user", title, content) VALUES ($1, $2, $3);',
+        const { rows: insertedRows } = await fastify.pg.query(
+            'INSERT INTO notes ("user", title, content) VALUES ($1, $2, $3) RETURNING *;',
             [user, title, content]
         )
         
-        reply.status(201).send({ message: 'Note created successfully' })
+        reply.status(201).send(insertedRows[0])
     })
 
     fastify.delete('/notes/:id', { onRequest: [fastify.authenticate], schema: schemas.deleteNoteSchema }, async (req, reply) => {

@@ -91,11 +91,15 @@ const noteSchema = {
         additionalProperties: false
     },
     response: {
-        200: {
+        201: {
             type: 'object',
-            required: ['message'],
             properties: {
-                message: {type: 'string'}
+                id: { type: 'string' },
+                user: { type: 'string' },
+                title: { type: 'string' },
+                content: { type: 'string' },
+                created_at: { type: 'string' },
+                deleted_at: { type: 'string' }
             }
         }
     }
