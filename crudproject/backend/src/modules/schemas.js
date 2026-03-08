@@ -47,6 +47,9 @@ const loginSchema = {
                 type: 'string',
                 minLength: 8,
                 pattern: '^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).+$'
+            },
+            rememberMe: {
+                type: 'boolean'
             }
         },
         additionalProperties: false

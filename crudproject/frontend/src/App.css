@@ -168,3 +168,15 @@
 .modal-content button, input, textarea {
   font-size: 1.5rem;
 }
+
+.remember-me-label {
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.remember-me-label input {
+  width: 20px;
+  height: 20px;
+}

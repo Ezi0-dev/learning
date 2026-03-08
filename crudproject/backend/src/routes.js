@@ -127,7 +127,13 @@ async function routes (fastify, options) {
     })
 
     fastify.post('/login', { schema: schemas.login }, async (req, reply) => {
-        const { username, password } = req.body;
+        const { username, password, rememberMe } = req.body;
+
+        // For JWT
+        const refreshExpiresIn = rememberMe ? '30d' : '7d'
+
+        // For DB
+        const expiresAt = rememberMe ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
 
         const { rows } = await fastify.pg.query(
             'SELECT id, username, email, password, ip_address FROM users WHERE username = $1;', [username]
@@ -145,11 +151,11 @@ async function routes (fastify, options) {
 
             const refreshToken = fastify.jwt.sign(
                 { id: user.id, },
-                { expiresIn: process.env.REFRESH_TOKEN_EXP}
+                { expiresIn: refreshExpiresIn}
             );
 
             await fastify.pg.query(
-                `INSERT INTO sessions (user_id, refresh_token, expires_at) VALUES ($1, $2, NOW() + INTERVAL '7 days')`, [user.id, refreshToken]
+                'INSERT INTO sessions (user_id, refresh_token, expires_at) VALUES ($1, $2, $3)', [user.id, refreshToken, expiresAt]
             );
             
             reply

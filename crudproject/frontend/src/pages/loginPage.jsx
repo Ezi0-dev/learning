@@ -8,6 +8,7 @@ export default function LoginPage() {
     const location = useLocation()
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
+    const [rememberMe, setRememberMe] = useState(false)
     const [error, setError] = useState(location.state?.error || '')
     const { setAccessToken, setUser } = useAuth()
     const navigate = useNavigate()
@@ -17,7 +18,7 @@ export default function LoginPage() {
       setError('')
 
       try {
-        const response = await api.post('/login', { username, password })
+        const response = await api.post('/login', { username, password, rememberMe })
 
         setAccessToken(response.accessToken)
         api.setToken(response.accessToken)
@@ -58,6 +59,17 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
             />
+
+            <label className="remember-me-label" htmlFor="rememberMe">
+                <input
+                    type="checkbox"
+                    id="rememberMe"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                />
+                Remember me
+            </label>
+
             <input type='submit' value="Login"/>
             </form>
         </div>
